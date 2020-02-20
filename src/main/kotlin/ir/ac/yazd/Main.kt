@@ -3,9 +3,9 @@ package ir.ac.yazd
 import java.io.File
 
 fun main() {
-    val listOfEdgeCount = generateListOfEdgeCount()
-    val listOfMergedEdgeCount = mergeEdgeCounts(listOfEdgeCount)
-    listOfMergedEdgeCount.forEach { println("Edge count: ${it.key}, Frequency: ${it.value.size}") }
+    val edgeCounts = generateListOfEdgeCount()
+    val edgeCountFreq = mergeEdgeCounts(edgeCounts)
+    edgeCountFreq.forEach { println("Edge count: ${it.key}, Frequency: ${it.value.size}") }
 }
 
 private fun generateListOfEdgeCount(): List<Int> {
@@ -18,4 +18,4 @@ private fun generateListOfEdgeCount(): List<Int> {
         .map { it.value.size }
 }
 
-fun mergeEdgeCounts(list: List<Int>) = list.groupBy { it }/* Map from edge count to count */.entries.sortedBy { it.key }
+fun mergeEdgeCounts(list: List<Int>) = list.groupBy { it }.entries.sortedBy { it.key }
