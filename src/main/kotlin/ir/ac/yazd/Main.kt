@@ -18,4 +18,4 @@ private fun generateListOfEdgeCount(): List<Int> {
         .map { it.value.size }
 }
 
-fun mergeEdgeCounts(list: List<Int>) = list.groupBy { it }.entries.sortedBy { it.key }
+private fun mergeEdgeCounts(list: List<Int>) = list.groupBy { it }.entries.sortedBy { it.key }
