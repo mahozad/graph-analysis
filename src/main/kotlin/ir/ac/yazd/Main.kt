@@ -12,8 +12,6 @@ import java.nio.file.Paths
 fun main() {
     val edgeCounts = generateListOfEdgeCount()
     val edgeCountFreq = mergeEdgeCounts(edgeCounts)
-    edgeCountFreq.forEach { println("Edge count: ${it.key}, Frequency: ${it.value.size}") }
-
 
     val templateResolver = FileTemplateResolver().apply { templateMode = HTML }
     val templateEngine = TemplateEngine().apply { setTemplateResolver(templateResolver) }
