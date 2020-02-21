@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+
+<html lang="en-US" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Songs</title>
+    <link rel="icon" href="../web/images/favicon.png">
+    <link rel="stylesheet" href="src/main/resources/css/Chart.min.css">
+</head>
+
+<body>
+
+<header>
+    <h1 class="title centered col-sm">Music repository</h1>
+    <section class="rep-info">
+        <div class="info">
+            <img src="../web/images/musical-note.svg" alt="Number of songs" width="32px">
+            <h2 class="info-title" th:text="'Number of frequencies: ' + ${edgeCountFreq.size}">Number of songs</h2>
+        </div>
+    </section>
+</header>
+
+<main>
+    <!--<form class="navbar-form" action="/action_page.php">-->
+    <!--    <div class="input-group col-xs-6">-->
+    <!--        <input type="text" class="form-control" placeholder="Search" name="search">-->
+    <!--        <div class="input-group-btn">-->
+    <!--            <button class="btn btn-default" type="submit">-->
+    <!--                <i class="glyphicon glyphicon-search"></i>-->
+    <!--            </button>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--</form>-->
+    <!--<table id="table1" class="table table-striped table-hover">-->
+    <!--    <thead>-->
+    <!--    <tr>-->
+    <!--        <th>Cover</th>-->
+    <!--        <th onclick="sortTable(1)">Title</th>-->
+    <!--        <th onclick="sortTable(2)">Artist</th>-->
+    <!--        <th onclick="sortTable(3)">Album</th>-->
+    <!--        <th onclick="sortTable(4)">Year</th>-->
+    <!--        <th onclick="sortTable(5)">Genre</th>-->
+    <!--        <th onclick="sortTable(6)">Album Artist</th>-->
+    <!--        <th onclick="sortTable(7)">Composer</th>-->
+    <!--    </tr>-->
+    <!--    </thead>-->
+
+    <!--    <tr th:each="song : ${songs}">-->
+    <!--        <td class="cover" width="36px">-->
+    <!--            <a th:href="'image/' + ${song.getCoverName()}">-->
+    <!--                <img th:src="'image/' + ${song.getCoverName()}"-->
+    <!--                     alt="cover art" width="36" height="36">-->
+    <!--            </a>-->
+    <!--        </td>-->
+    <!--        <td th:text="${song.getTitle()}">title</td>-->
+    <!--        <td th:text="${song.getArtist()}">artist</td>-->
+    <!--        <td th:text="${song.getAlbum()}">album</td>-->
+    <!--        <td th:text="${song.getYear()}">year</td>-->
+    <!--        <td th:text="${song.getGenre()}">genre</td>-->
+    <!--        <td th:text="${song.getAlbumArtist()}">album artist</td>-->
+    <!--        <td th:text="${song.getComposer()}">composer</td>-->
+    <!--    </tr>-->
+
+    <!--</table>-->
+
+    <canvas id="chart" width="400" height="400"></canvas>
+
+</main>
+
+<script src="src/main/resources/js/Chart.min.js"></script>
+<script th:inline="javascript">
+    let edgeCounts= /*[[${edgeCounts}]]*/ "default";
+    let edgeCountFreq = /*[[${edgeCountFreq}]]*/ "default";
+
+    let cxt = document.getElementById("chart").getContext("2d");
+    let chart = new Chart(cxt, {
+        type: "line",
+        data: {
+            labels: edgeCounts,
+            datasets: [{
+                label: "Edge Count Frequency",
+                data: edgeCountFreq,
+                borderColor: "#4a57cd",
+                fill: false
+            }]
+        }
+    });
+</script>
+
+
+</body>
+
+</html>

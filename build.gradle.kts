@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation("org.thymeleaf:thymeleaf:3.0.11.RELEASE")
 }
 
 tasks {
