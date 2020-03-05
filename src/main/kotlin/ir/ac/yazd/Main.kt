@@ -14,16 +14,15 @@ val templateFilePath: Path = Path.of("src/main/resources/html/template.html")
 
 fun main() {
     val edgeCounts = generateListOfIngoingEdgeCount()
-    val edgeCountFreq = mergeEdgeCounts(edgeCounts)
+    val edgeCountToFreq = mergeEdgeCounts(edgeCounts)
 
-    val templateResolver = FileTemplateResolver().apply { templateMode = HTML }
-    val templateEngine = TemplateEngine().apply { setTemplateResolver(templateResolver) }
+    val templateEngine = setupTemplateEngine()
 
-    val context = Context()
-    context.setVariable("edgeCounts", edgeCountFreq.map { it.key })
-    context.setVariable("edgeCountFreq", edgeCountFreq.map { it.value.size })
+    val thymeleafCxt = Context()
+    thymeleafCxt.setVariable("edgeCounts", edgeCountToFreq.map { it.key })
+    thymeleafCxt.setVariable("edgeCountFreq", edgeCountToFreq.map { it.value.size })
     val stringWriter = StringWriter()
-    templateEngine.process(templateFilePath.toString(), context, stringWriter)
+    templateEngine.process(templateFilePath.toString(), thymeleafCxt, stringWriter)
 
     Files.newBufferedWriter(outputFilePath).use { writer -> writer.write(stringWriter.toString()) }
 }
@@ -31,9 +30,15 @@ fun main() {
 private fun generateListOfIngoingEdgeCount(): List<Int> {
     return Files.newBufferedReader(sourceFilePath)
             .lineSequence()
+            // .take(1000)
             // Map node to its in-going edge count (substitute Before/After to switch between out and in)
             .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
             .map { it.value.size }
 }
 
 private fun mergeEdgeCounts(list: List<Int>) = list.groupBy { it }.entries.sortedBy { it.key }
+
+private fun setupTemplateEngine(): TemplateEngine {
+    val templateResolver = FileTemplateResolver().apply { templateMode = HTML }
+    return TemplateEngine().apply { setTemplateResolver(templateResolver) }
+}
