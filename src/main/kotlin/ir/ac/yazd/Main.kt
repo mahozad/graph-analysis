@@ -31,7 +31,7 @@ private fun generateListOfIngoingEdgeCount(): List<Int> {
     return File(SOURCE_FILE_PATH)
             .bufferedReader()
             .lineSequence()
-            // A map from node to its in-going edge count (substitute Before/After to switch between out- and in-degree)
+            // Map node to its in-going edge count (substitute Before/After to switch between out and in)
             .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
             .map { it.value.size }
 }
