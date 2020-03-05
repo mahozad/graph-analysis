@@ -10,6 +10,7 @@ import java.nio.file.Path
 
 val sourceFilePath: Path = Path.of("src/main/resources/graph.txt")
 val outputFilePath: Path = Path.of("result.html")
+val templateFilePath: Path = Path.of("src/main/resources/html/template.html")
 
 fun main() {
     val edgeCounts = generateListOfIngoingEdgeCount()
@@ -22,7 +23,7 @@ fun main() {
     context.setVariable("edgeCounts", edgeCountFreq.map { it.key })
     context.setVariable("edgeCountFreq", edgeCountFreq.map { it.value.size })
     val stringWriter = StringWriter()
-    templateEngine.process("src/main/resources/html/template.html", context, stringWriter)
+    templateEngine.process(templateFilePath.toString(), context, stringWriter)
 
     Files.newBufferedWriter(outputFilePath).use { writer -> writer.write(stringWriter.toString()) }
 }
