@@ -8,7 +8,8 @@ import java.io.StringWriter
 import java.nio.file.Files
 import java.nio.file.Path
 
-val sourceFilePath = Path.of("src/main/resources/graph.txt")
+val sourceFilePath: Path = Path.of("src/main/resources/graph.txt")
+val outputFilePath: Path = Path.of("result.html")
 
 fun main() {
     val edgeCounts = generateListOfIngoingEdgeCount()
@@ -23,7 +24,7 @@ fun main() {
     val stringWriter = StringWriter()
     templateEngine.process("src/main/resources/html/template.html", context, stringWriter)
 
-    Files.newBufferedWriter(Paths.get("result.html")).use { writer -> writer.write(stringWriter.toString()) }
+    Files.newBufferedWriter(outputFilePath).use { writer -> writer.write(stringWriter.toString()) }
 }
 
 private fun generateListOfIngoingEdgeCount(): List<Int> {
