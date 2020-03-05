@@ -9,6 +9,8 @@ import java.io.StringWriter
 import java.nio.file.Files
 import java.nio.file.Paths
 
+const val SOURCE_FILE_PATH = "src/main/resources/graph.txt"
+
 fun main() {
     val edgeCounts = generateListOfIngoingEdgeCount()
     val edgeCountFreq = mergeEdgeCounts(edgeCounts)
@@ -26,13 +28,12 @@ fun main() {
 }
 
 private fun generateListOfIngoingEdgeCount(): List<Int> {
-    return File("src/main/resources/graph.txt")
-        .bufferedReader()
-        .lineSequence()
-        // .take(200)
-        /* A map from node to its in-going edge count (substitute Before/After to switch between out- and in-degree) */
-        .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
-        .map { it.value.size }
+    return File(SOURCE_FILE_PATH)
+            .bufferedReader()
+            .lineSequence()
+            // A map from node to its in-going edge count (substitute Before/After to switch between out- and in-degree)
+            .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
+            .map { it.value.size }
 }
 
 private fun mergeEdgeCounts(list: List<Int>) = list.groupBy { it }.entries.sortedBy { it.key }
