@@ -8,20 +8,20 @@ import java.io.StringWriter
 import java.nio.file.Files
 import java.nio.file.Path
 
-val sourceFilePath: Path = Path.of("src/main/resources/graph.txt")
-val outputFilePath: Path = Path.of("result.html")
-val templateFilePath: Path = Path.of("src/main/resources/html/template.html")
+private val sourceFilePath: Path = Path.of("src/main/resources/graph.txt")
+private val outputFilePath: Path = Path.of("result.html")
+private val templateFilePath: Path = Path.of("src/main/resources/html/template.html")
+private val stringWriter = StringWriter()
 
 fun main() {
     val edgeCounts = generateListOfIngoingEdgeCount()
     val edgeCountToFreq = mergeEdgeCounts(edgeCounts)
 
-    val templateEngine = setupTemplateEngine()
-
     val thymeleafCxt = Context()
     thymeleafCxt.setVariable("edgeCounts", edgeCountToFreq.map { it.key })
     thymeleafCxt.setVariable("edgeCountFreq", edgeCountToFreq.map { it.value.size })
-    val stringWriter = StringWriter()
+
+    val templateEngine = setupTemplateEngine()
     templateEngine.process(templateFilePath.toString(), thymeleafCxt, stringWriter)
 
     Files.newBufferedWriter(outputFilePath).use { writer -> writer.write(stringWriter.toString()) }
