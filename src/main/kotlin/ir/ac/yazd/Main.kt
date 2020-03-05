@@ -4,12 +4,11 @@ import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
 import org.thymeleaf.templatemode.TemplateMode.HTML
 import org.thymeleaf.templateresolver.FileTemplateResolver
-import java.io.File
 import java.io.StringWriter
 import java.nio.file.Files
-import java.nio.file.Paths
+import java.nio.file.Path
 
-const val SOURCE_FILE_PATH = "src/main/resources/graph.txt"
+val sourceFilePath = Path.of("src/main/resources/graph.txt")
 
 fun main() {
     val edgeCounts = generateListOfIngoingEdgeCount()
@@ -28,8 +27,7 @@ fun main() {
 }
 
 private fun generateListOfIngoingEdgeCount(): List<Int> {
-    return File(SOURCE_FILE_PATH)
-            .bufferedReader()
+    return Files.newBufferedReader(sourceFilePath)
             .lineSequence()
             // Map node to its in-going edge count (substitute Before/After to switch between out and in)
             .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
