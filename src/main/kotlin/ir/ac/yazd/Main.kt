@@ -10,7 +10,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 fun main() {
-    val edgeCounts = generateListOfEdgeCount()
+    val edgeCounts = generateListOfIngoingEdgeCount()
     val edgeCountFreq = mergeEdgeCounts(edgeCounts)
 
     val templateResolver = FileTemplateResolver().apply { templateMode = HTML }
@@ -25,7 +25,7 @@ fun main() {
     Files.newBufferedWriter(Paths.get("result.html")).use { writer -> writer.write(stringWriter.toString()) }
 }
 
-private fun generateListOfEdgeCount(): List<Int> {
+private fun generateListOfIngoingEdgeCount(): List<Int> {
     return File("src/main/resources/graph.txt")
         .bufferedReader()
         .lineSequence()
