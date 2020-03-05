@@ -7,6 +7,7 @@ import org.thymeleaf.templateresolver.FileTemplateResolver
 import java.io.StringWriter
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.math.pow
 
 private val sourceFilePath: Path = Path.of("src/main/resources/graph.txt")
 private val outputFilePath: Path = Path.of("result.html")
@@ -20,10 +21,28 @@ fun main() {
     val thContext = Context()
     thContext.setVariable("edgeCounts", edgeCountToFreq.map { it.first })
     thContext.setVariable("edgeCountFreq", edgeCountToFreq.map { it.second })
+    // groupByPowerOf10(edgeCountToFreq, thContext)
 
     setupTemplateEngine(thContext)
 
     Files.newBufferedWriter(outputFilePath).use { writer -> writer.write(stringWriter.toString()) }
+}
+
+private fun groupByPowerOf10(edgeCountToFreq: List<Pair<Int, Int>>, thContext: Context) {
+    val freq = mutableMapOf<String, Int>()
+    try {
+        for (i in 0..10) {
+            val from = 10.0.pow(i).toInt() - 1
+            val to = 10.0.pow(i + 1).toInt() - 2
+            for (j in from until to) {
+                freq.merge("10^${i}-10^${i + 1}", edgeCountToFreq[j].second) { t, u -> t + u }
+            }
+        }
+    } catch (e: Exception) {
+
+    }
+    thContext.setVariable("edgeCounts", freq.keys)
+    thContext.setVariable("edgeCountFreq", freq.values)
 }
 
 private fun generateListOfIngoingEdgeCount(): List<Int> {
