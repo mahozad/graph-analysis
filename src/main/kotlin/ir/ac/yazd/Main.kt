@@ -18,8 +18,8 @@ fun main() {
     val edgeCountToFreq = mergeEdgeCounts(edgeCounts)
 
     val thContext = Context()
-    thContext.setVariable("edgeCounts", edgeCountToFreq.map { it.key })
-    thContext.setVariable("edgeCountFreq", edgeCountToFreq.map { it.value.size })
+    thContext.setVariable("edgeCounts", edgeCountToFreq.map { it.first })
+    thContext.setVariable("edgeCountFreq", edgeCountToFreq.map { it.second })
 
     setupTemplateEngine(thContext)
 
@@ -35,7 +35,10 @@ private fun generateListOfIngoingEdgeCount(): List<Int> {
             .map { it.value.size }
 }
 
-private fun mergeEdgeCounts(list: List<Int>) = list.groupBy { it }.entries.sortedBy { it.key }
+private fun mergeEdgeCounts(list: List<Int>) = list
+        .groupBy { it }
+        .entries.sortedBy { it.key }
+        .map { Pair(it.key, it.value.size) }
 
 private fun setupTemplateEngine(thymeleafCxt: Context): TemplateEngine {
     val templateResolver = FileTemplateResolver().apply { templateMode = HTML }
