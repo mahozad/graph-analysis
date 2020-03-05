@@ -17,12 +17,11 @@ fun main() {
     val edgeCounts = generateListOfIngoingEdgeCount()
     val edgeCountToFreq = mergeEdgeCounts(edgeCounts)
 
-    val thymeleafCxt = Context()
-    thymeleafCxt.setVariable("edgeCounts", edgeCountToFreq.map { it.key })
-    thymeleafCxt.setVariable("edgeCountFreq", edgeCountToFreq.map { it.value.size })
+    val thContext = Context()
+    thContext.setVariable("edgeCounts", edgeCountToFreq.map { it.key })
+    thContext.setVariable("edgeCountFreq", edgeCountToFreq.map { it.value.size })
 
-    val templateEngine = setupTemplateEngine()
-    templateEngine.process(templateFilePath.toString(), thymeleafCxt, stringWriter)
+    setupTemplateEngine(thContext)
 
     Files.newBufferedWriter(outputFilePath).use { writer -> writer.write(stringWriter.toString()) }
 }
@@ -38,7 +37,9 @@ private fun generateListOfIngoingEdgeCount(): List<Int> {
 
 private fun mergeEdgeCounts(list: List<Int>) = list.groupBy { it }.entries.sortedBy { it.key }
 
-private fun setupTemplateEngine(): TemplateEngine {
+private fun setupTemplateEngine(thymeleafCxt: Context): TemplateEngine {
     val templateResolver = FileTemplateResolver().apply { templateMode = HTML }
-    return TemplateEngine().apply { setTemplateResolver(templateResolver) }
+    val templateEngine = TemplateEngine().apply { setTemplateResolver(templateResolver) }
+    templateEngine.process(templateFilePath.toString(), thymeleafCxt, stringWriter)
+    return templateEngine
 }
