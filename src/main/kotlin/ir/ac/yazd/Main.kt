@@ -16,12 +16,12 @@ private val stringWriter = StringWriter()
 
 fun main() {
     val edgeCounts = generateListOfIngoingEdgeCount()
-    val edgeCountToFreq = mergeEdgeCounts(edgeCounts)
+    val edgeCountFreq = mergeEdgeCounts(edgeCounts)
 
     val thContext = Context()
-    thContext.setVariable("edgeCounts", edgeCountToFreq.map { it.first })
-    thContext.setVariable("edgeCountFreq", edgeCountToFreq.map { it.second })
-    // groupByPowerOf10(edgeCountToFreq, thContext)
+    thContext.setVariable("edgeCounts", edgeCountFreq.map { it.first })
+    thContext.setVariable("edgeCountFreq", edgeCountFreq.map { it.second })
+    // groupByPowerOf10(edgeCountFreq, thContext)
 
     setupTemplateEngine(thContext)
 
@@ -59,9 +59,9 @@ private fun mergeEdgeCounts(list: List<Int>) = list
         .entries.sortedBy { it.key }
         .map { Pair(it.key, it.value.size) }
 
-private fun setupTemplateEngine(thymeleafCxt: Context): TemplateEngine {
+private fun setupTemplateEngine(thContext: Context): TemplateEngine {
     val templateResolver = FileTemplateResolver().apply { templateMode = HTML }
     val templateEngine = TemplateEngine().apply { setTemplateResolver(templateResolver) }
-    templateEngine.process(templateFilePath.toString(), thymeleafCxt, stringWriter)
+    templateEngine.process(templateFilePath.toString(), thContext, stringWriter)
     return templateEngine
 }
