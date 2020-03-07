@@ -85,7 +85,10 @@ private fun determineIfGraphIsBowTie() {
 
     val visiting = mutableSetOf<Int>()
     fun canFirstNodeReachTheSecondNode(first: Int, second: Int): Boolean {
+        if (!map.containsKey(first)) return false
+
         if (map.getValue(first).contains(second)) return true
+
         visiting.add(first)
         var isConnected = false
         for (n in map.getValue(first)) {
