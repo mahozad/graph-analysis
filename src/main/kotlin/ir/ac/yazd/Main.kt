@@ -7,8 +7,7 @@ import org.thymeleaf.templateresolver.FileTemplateResolver
 import java.io.StringWriter
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.PriorityBlockingQueue
+import java.util.*
 import kotlin.math.pow
 
 private val sourceFilePath: Path = Path.of("src/main/resources/sample-graph.txt")
@@ -99,8 +98,7 @@ private fun determineIfGraphIsBowTie() {
     }
 
     val connectedNodes = mutableSetOf(map.keys.first())
-    val queue: BlockingQueue<Int> = PriorityBlockingQueue()
-    queue.add(map.keys.first())
+    val queue: Queue<Int> = ArrayDeque(connectedNodes)
 
     while (true) {
         val next = queue.poll() ?: break
