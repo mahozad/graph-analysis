@@ -84,13 +84,13 @@ private fun determineIfGraphIsBowTie() {
 
 
     val visiting = mutableSetOf<Int>()
-    fun isNodeConnectedWithNode(first: Int, second: Int): Boolean {
+    fun canFirstNodeReachTheSecondNode(first: Int, second: Int): Boolean {
         if (map.getValue(first).contains(second)) return true
         visiting.add(first)
         var isConnected = false
         for (n in map.getValue(first)) {
             if (!visiting.contains(n)) {
-                isConnected = isNodeConnectedWithNode(n, second)
+                isConnected = canFirstNodeReachTheSecondNode(n, second)
                 if (isConnected) break
             }
         }
@@ -107,7 +107,7 @@ private fun determineIfGraphIsBowTie() {
             // Now, we can't add the node to the connected set unless the reverse is also true,
             // that is, we are able to reach the "next" from "node". So we check it as follows:
             visiting.clear()
-            if (isNodeConnectedWithNode(node, next)) {
+            if (canFirstNodeReachTheSecondNode(node, next)) {
                 if (!connectedNodes.contains(node)) queue.add(node)
                 connectedNodes.add(node)
             }
