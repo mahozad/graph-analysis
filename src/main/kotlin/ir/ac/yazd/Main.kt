@@ -7,15 +7,18 @@ import org.thymeleaf.templateresolver.FileTemplateResolver
 import java.io.StringWriter
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.PriorityBlockingQueue
 import kotlin.math.pow
 
-private val sourceFilePath: Path = Path.of("src/main/resources/graph.txt")
+private val sourceFilePath: Path = Path.of("src/main/resources/sample-graph.txt")
 private val outputFilePath: Path = Path.of("result.html")
 private val templateFilePath: Path = Path.of("src/main/resources/html/template.html")
 private val stringWriter = StringWriter()
 
 fun main() {
-    determineIfAdheresPowerLaw()
+    //    determineIfAdheresPowerLaw()
+    determineIfGraphIsBowTie()
 }
 
 private fun determineIfAdheresPowerLaw() {
@@ -68,4 +71,39 @@ private fun setupTemplateEngine(thContext: Context): TemplateEngine {
     val templateEngine = TemplateEngine().apply { setTemplateResolver(templateResolver) }
     templateEngine.process(templateFilePath.toString(), thContext, stringWriter)
     return templateEngine
+}
+
+private fun determineIfGraphIsBowTie() {
+    val map = Files.newBufferedReader(sourceFilePath)
+            .lineSequence()
+            .take(100_000)
+            .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
+
+
+    fun isNodeConnectedWithNode(first: Int, second: Int): Boolean {
+        if (map.getValue(first).contains(second)) {
+            return true
+        }
+        var isConnected = false
+        for (n in map.getValue(first)) {
+            isConnected = isConnected || isNodeConnectedWithNode(n, second)
+        }
+        return isConnected
+    }
+
+    val connectedNodes = mutableSetOf(map.keys.first())
+    val queue: BlockingQueue<Int> = PriorityBlockingQueue()
+    queue.add(map.keys.first())
+
+    while (true) {
+        val next = queue.poll() ?: break
+        for (node in map.getValue(next)) {
+            if (isNodeConnectedWithNode(node, next)) {
+                if (!connectedNodes.contains(node)) queue.add(node)
+                connectedNodes.add(node)
+            }
+        }
+    }
+
+    println(connectedNodes)
 }
