@@ -80,13 +80,16 @@ private fun determineIfGraphIsBowTie() {
             .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
 
 
+    val visiting = mutableSetOf<Int>()
     fun isNodeConnectedWithNode(first: Int, second: Int): Boolean {
-        if (map.getValue(first).contains(second)) {
-            return true
-        }
+        if (map.getValue(first).contains(second)) return true
+        visiting.add(first)
         var isConnected = false
         for (n in map.getValue(first)) {
-            isConnected = isConnected || isNodeConnectedWithNode(n, second)
+            if (!visiting.contains(n)) {
+                isConnected = isNodeConnectedWithNode(n, second)
+                if (isConnected) break
+            }
         }
         return isConnected
     }
@@ -98,6 +101,7 @@ private fun determineIfGraphIsBowTie() {
     while (true) {
         val next = queue.poll() ?: break
         for (node in map.getValue(next)) {
+            visiting.clear()
             if (isNodeConnectedWithNode(node, next)) {
                 if (!connectedNodes.contains(node)) queue.add(node)
                 connectedNodes.add(node)
