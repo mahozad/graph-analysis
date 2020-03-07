@@ -100,23 +100,30 @@ private fun determineIfGraphIsBowTie() {
         return isConnected
     }
 
-    val connectedNodes = mutableSetOf(map.keys.first())
-    val queue: Queue<Int> = ArrayDeque(connectedNodes)
+
+    val queue: Queue<Int> = ArrayDeque(map.keys)
+    val sets = mutableListOf(mutableSetOf(queue.element()))
+    var currentSet = 0
+
+    fun isNodeInSets(node: Int): Boolean {
+        for (set in sets) if (set.contains(node)) return true
+        return false
+    }
 
     while (true) {
         val node = queue.poll() ?: break
+        visiting.clear()
+        if (!isNodeInSets(node) && !canFirstNodeReachTheSecondNode(sets[currentSet].first(), node)) {
+            currentSet++
+            sets.add(mutableSetOf(node))
+        }
         for (target in map.getValue(node)) {
-            if (connectedNodes.contains(target)) continue
-            // The "target" is in the list of "node" so it is reachable from "node".
-            // Now, we can't add "target" to the connected set unless the reverse is also true,
-            // that is, "node" be reachable from "target". So we check it as follows:
             visiting.clear()
             if (canFirstNodeReachTheSecondNode(target, node)) {
-                connectedNodes.add(target)
-                queue.add(target)
+                sets[currentSet].add(target)
             }
         }
     }
 
-    println(connectedNodes.sorted())
+    sets.forEach { println(it) }
 }
