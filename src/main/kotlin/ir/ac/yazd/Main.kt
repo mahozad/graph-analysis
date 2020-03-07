@@ -103,13 +103,14 @@ private fun determineIfGraphIsBowTie() {
     while (true) {
         val node = queue.poll() ?: break
         for (target in map.getValue(node)) {
+            if (connectedNodes.contains(target)) continue
             // The "target" is in the list of "node" so it is reachable from "node".
             // Now, we can't add "target" to the connected set unless the reverse is also true,
             // that is, "node" be reachable from "target". So we check it as follows:
             visiting.clear()
             if (canFirstNodeReachTheSecondNode(target, node)) {
-                if (!connectedNodes.contains(target)) queue.add(target)
                 connectedNodes.add(target)
+                queue.add(target)
             }
         }
     }
