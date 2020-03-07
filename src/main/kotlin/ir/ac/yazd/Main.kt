@@ -16,6 +16,10 @@ private val outputFilePath: Path = Path.of("result.html")
 private val templateFilePath: Path = Path.of("src/main/resources/html/template.html")
 private val stringWriter = StringWriter()
 
+// You can use a VM option named ss to adjust the maximum stack size.
+// A VM option is usually passed using -X{option}. So you can use java -Xss1M to set the maximum of
+// stack size to 1 Megabyte
+
 fun main() {
     //    determineIfAdheresPowerLaw()
     determineIfGraphIsBowTie()
@@ -101,6 +105,9 @@ private fun determineIfGraphIsBowTie() {
     while (true) {
         val next = queue.poll() ?: break
         for (node in map.getValue(next)) {
+            // The "node" is in the list of the "next" so it is reachable from "next".
+            // Now, we can't add the node to the connected set unless the reverse is also true,
+            // that is, we are able to reach the "next" from "node". So we check it as follows:
             visiting.clear()
             if (isNodeConnectedWithNode(node, next)) {
                 if (!connectedNodes.contains(node)) queue.add(node)
