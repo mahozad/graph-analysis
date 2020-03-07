@@ -15,6 +15,10 @@ private val templateFilePath: Path = Path.of("src/main/resources/html/template.h
 private val stringWriter = StringWriter()
 
 fun main() {
+    determineIfAdheresPowerLaw()
+}
+
+private fun determineIfAdheresPowerLaw() {
     val edgeCounts = generateListOfIngoingEdgeCount()
     val edgeCountFreq = mergeEdgeCounts(edgeCounts)
 
