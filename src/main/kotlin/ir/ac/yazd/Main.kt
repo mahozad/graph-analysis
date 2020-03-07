@@ -109,5 +109,5 @@ private fun determineIfGraphIsBowTie() {
         }
     }
 
-    println(connectedNodes)
+    println(connectedNodes.sorted())
 }
