@@ -110,8 +110,8 @@ private fun determineIfGraphIsBowTie() {
         return false
     }
 
-    while (true) {
-        val node = queue.poll() ?: break
+    while (!queue.isEmpty()) {
+        val node = queue.remove()
         visiting.clear()
         if (!isNodeInSets(node) && !canFirstNodeReachTheSecondNode(sets[currentSet].first(), node)) {
             currentSet++
