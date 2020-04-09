@@ -10,9 +10,9 @@ import java.nio.file.Path
 import kotlin.math.log10
 import kotlin.math.pow
 
-private val sourceFilePath: Path = Path.of("src/main/resources/sample-graph.txt")
-private val outputFilePath: Path = Path.of("result.html")
-private val templateFilePath: Path = Path.of("src/main/resources/html/template.html")
+private val sourceFilePath = Path.of("src/main/resources/sample-graph.txt")
+private val outputFilePath = Path.of("result.html")
+private val templateFilePath = Path.of("src/main/resources/html/template.html")
 private val stringWriter = StringWriter()
 
 // You can use a VM option named ss to adjust the maximum stack size.
@@ -73,17 +73,17 @@ private fun determineIfAdheresPowerLaw2() {
 
 private fun generateListOfIngoingEdgeCount(): List<Int> {
     return Files.newBufferedReader(sourceFilePath)
-        .lineSequence()
-        // .take(1000)
-        // Map node to its in-going edge count (substitute Before/After to switch between out and in)
-        .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
-        .map { it.value.size }
+            .lineSequence()
+            // .take(1000)
+            // Map node to its in-going edge count (substitute Before/After to switch between out and in)
+            .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
+            .map { it.value.size }
 }
 
 private fun mergeEdgeCounts(list: List<Int>) = list
-    .groupBy { it }
-    .entries.sortedBy { it.key }
-    .map { Pair(it.key, it.value.size) }
+        .groupBy { it }
+        .entries.sortedBy { it.key }
+        .map { Pair(it.key, it.value.size) }
 
 private fun setupTemplateEngine(thContext: Context): TemplateEngine {
     val templateResolver = FileTemplateResolver().apply { templateMode = HTML }

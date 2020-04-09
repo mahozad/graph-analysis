@@ -4,7 +4,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 
-private val sourceFilePath: Path = Path.of("src/main/resources/sample-graph.txt")
+private val sourceFilePath = Path.of("src/main/resources/sample-graph.txt")
 
 fun main() {
     determineIfGraphIsBowTie()
