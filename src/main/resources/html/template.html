@@ -21,8 +21,8 @@
   </section>
 </header>
 
-<main>
-  <canvas id="chart" width="400" height="400"></canvas>
+<main style="width: 1600px; height: 800px; margin: auto">
+  <canvas id="chart"></canvas>
 </main>
 
 <script src="src/main/resources/js/Chart.min.js"></script>
@@ -33,6 +33,9 @@
     let cxt = document.getElementById("chart").getContext("2d");
     let chart = new Chart(cxt, {
         type: "line",
+        responsive: false,
+        width: 500,
+        height: 600,
         data: {
             labels: edgeCounts,
             datasets: [{

@@ -8,6 +8,7 @@ import java.io.StringWriter
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
+import kotlin.math.log10
 import kotlin.math.pow
 
 private val sourceFilePath: Path = Path.of("src/main/resources/sample-graph.txt")
@@ -20,11 +21,28 @@ private val stringWriter = StringWriter()
 // stack size to 1 Megabyte
 
 fun main() {
-    //    determineIfAdheresPowerLaw()
+    determineIfAdheresPowerLaw1()
     determineIfGraphIsBowTie()
 }
 
-private fun determineIfAdheresPowerLaw() {
+private fun determineIfAdheresPowerLaw1() {
+    val edgeCounts = generateListOfIngoingEdgeCount()
+    val edgeCountFreq = mergeEdgeCounts(edgeCounts).filter {
+        // Filter only powers of ten
+        it.first == 1 || it.first == 10 || it.first == 100 || it.first == 1000 ||
+                it.first == 10000 || it.first == 100000 || it.first == 1000000
+    }
+
+    val thContext = Context()
+    thContext.setVariable("edgeCounts", edgeCountFreq.map { it.first })
+    thContext.setVariable("edgeCountFreq", edgeCountFreq.map { log10(it.second.toDouble()) })
+
+    setupTemplateEngine(thContext)
+
+    Files.newBufferedWriter(outputFilePath).use { writer -> writer.write(stringWriter.toString()) }
+}
+
+private fun determineIfAdheresPowerLaw2() {
     val edgeCounts = generateListOfIngoingEdgeCount()
     val edgeCountFreq = mergeEdgeCounts(edgeCounts)
 
@@ -36,38 +54,38 @@ private fun determineIfAdheresPowerLaw() {
     setupTemplateEngine(thContext)
 
     Files.newBufferedWriter(outputFilePath).use { writer -> writer.write(stringWriter.toString()) }
-}
 
-private fun groupByPowerOf10(edgeCountToFreq: List<Pair<Int, Int>>, thContext: Context) {
-    val freq = mutableMapOf<String, Int>()
-    try {
-        for (i in 0..10) {
-            val from = 10.0.pow(i).toInt() - 1
-            val to = 10.0.pow(i + 1).toInt() - 2
-            for (j in from until to) {
-                freq.merge("10^${i}-10^${i + 1}", edgeCountToFreq[j].second) { t, u -> t + u }
+    fun groupByPowerOf10(edgeCountToFreq: List<Pair<Int, Int>>, thContext: Context) {
+        val freq = mutableMapOf<String, Int>()
+        try {
+            for (i in 0..10) {
+                val from = 10.0.pow(i).toInt() - 1
+                val to = 10.0.pow(i + 1).toInt() - 2
+                for (j in from until to) {
+                    freq.merge("10^${i}-10^${i + 1}", edgeCountToFreq[j].second) { t, u -> t + u }
+                }
             }
-        }
-    } catch (e: Exception) {
+        } catch (e: Exception) {
 
+        }
+        thContext.setVariable("edgeCounts", freq.keys)
+        thContext.setVariable("edgeCountFreq", freq.values)
     }
-    thContext.setVariable("edgeCounts", freq.keys)
-    thContext.setVariable("edgeCountFreq", freq.values)
 }
 
 private fun generateListOfIngoingEdgeCount(): List<Int> {
     return Files.newBufferedReader(sourceFilePath)
-            .lineSequence()
-            // .take(1000)
-            // Map node to its in-going edge count (substitute Before/After to switch between out and in)
-            .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
-            .map { it.value.size }
+        .lineSequence()
+        // .take(1000)
+        // Map node to its in-going edge count (substitute Before/After to switch between out and in)
+        .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
+        .map { it.value.size }
 }
 
 private fun mergeEdgeCounts(list: List<Int>) = list
-        .groupBy { it }
-        .entries.sortedBy { it.key }
-        .map { Pair(it.key, it.value.size) }
+    .groupBy { it }
+    .entries.sortedBy { it.key }
+    .map { Pair(it.key, it.value.size) }
 
 private fun setupTemplateEngine(thContext: Context): TemplateEngine {
     val templateResolver = FileTemplateResolver().apply { templateMode = HTML }
@@ -78,9 +96,9 @@ private fun setupTemplateEngine(thContext: Context): TemplateEngine {
 
 private fun determineIfGraphIsBowTie() {
     val map = Files.newBufferedReader(sourceFilePath)
-            .lineSequence()
-            .take(100_000)
-            .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
+        .lineSequence()
+        .take(100_000)
+        .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
 
 
     val visiting = mutableSetOf<Int>()
