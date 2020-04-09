@@ -4,9 +4,9 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 private val sourceFilePath: Path = Path.of("src/main/resources/sample-graph.txt")
-private lateinit var map: Map<Int, List<Int>>
+private lateinit var graph: Map<Int, List<Int>>
 fun main() {
-    map = Files.newBufferedReader(sourceFilePath)
+    graph = Files.newBufferedReader(sourceFilePath)
             .lineSequence()
             .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
 
@@ -21,12 +21,12 @@ private fun calculateShortestDistance(from: Int, to: Int): Int {
     val visited = mutableSetOf<Int>()
     fun calculate(from: Int, to: Int): Int {
         if (from == to) return 0
-        if (!map.containsKey(from)) return -1
-        if (map[from]!!.contains(to)) return +1
+        if (!graph.containsKey(from)) return -1
+        if (graph[from]!!.contains(to)) return +1
 
         visited.add(from)
         val distances = mutableListOf<Int>()
-        for (node in map[from]!!) {
+        for (node in graph[from]!!) {
             if (!visited.contains(node)) {
                 val distance = calculate(node, to)
                 if (distance != -1) distances.add(distance + 1)
