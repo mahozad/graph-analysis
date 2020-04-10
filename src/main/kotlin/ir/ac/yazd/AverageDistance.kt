@@ -23,18 +23,11 @@ fun main() {
     val executorService = Executors.newFixedThreadPool(4)
 
     val nodes = getRandomNodes()
-
-    for (i in 0..nodes.size) {
-        for (j in i + 1 until nodes.size) {
-            val node1 = nodes.elementAt(i)
-            val node2 = nodes.elementAt(j)
-            executorService.submit(DistanceCalculator(node1, node2))
-            executorService.submit(DistanceCalculator(node2, node1))
-        }
-    }
+    for (i in nodes.indices) executorService.submit(DistanceCalculator(nodes.elementAt(1), nodes.elementAt(i)))
 
     executorService.shutdown()
-    executorService.awaitTermination(5, DAYS)
+    executorService.awaitTermination(1, DAYS)
+
     println((targetNodesDistances.reduce { total, distance -> total + distance } / targetNodesDistances.size))
 }
 
