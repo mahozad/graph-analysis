@@ -3,8 +3,9 @@ package ir.ac.yazd
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.Collections.synchronizedList
+import java.util.Collections.synchronizedMap
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.DAYS
 
 private val sourceFilePath = Path.of("src/main/resources/graph.txt")
 private val graph = Files.newBufferedReader(sourceFilePath)
@@ -15,7 +16,8 @@ private val graph = Files.newBufferedReader(sourceFilePath)
     )
 
 //private val graphNodes = Files.newBufferedReader(sourceFilePath).lineSequence().map { it.substringBefore(" ").toInt() }.toSet()
-private val calculatedDistances = synchronizedList(ArrayList<Int>())
+private val actualDistances = synchronizedMap(HashMap<Pair<Int, Int>, Int>())
+private val targetNodesDistances = synchronizedList(ArrayList<Int>())
 
 fun main() {
     val executorService = Executors.newFixedThreadPool(4)
@@ -31,8 +33,9 @@ fun main() {
         }
     }
 
-    executorService.awaitTermination(30, TimeUnit.DAYS)
-    println((calculatedDistances.reduce { total, distance -> total + distance } / calculatedDistances.size))
+    executorService.shutdown()
+    executorService.awaitTermination(5, DAYS)
+    println((targetNodesDistances.reduce { total, distance -> total + distance } / targetNodesDistances.size))
 }
 
 /**
@@ -42,8 +45,9 @@ private fun calculateShortestDistance(from: Int, to: Int): Int {
     val visited = mutableSetOf<Int>()
     fun calculate(from: Int, to: Int): Int {
         if (from == to) return 0
-        if (!graph.keys.contains(from)) return -1 // Required
+        if (!graph.keys.contains(from)) return -1 // if statement required
         if (graph.getValue(from).contains(to)) return +1
+        if (actualDistances.keys.contains(Pair(from, to))) return actualDistances[Pair(from, to)]!!
 
         visited.add(from)
         val distances = mutableListOf<Int>()
@@ -53,7 +57,10 @@ private fun calculateShortestDistance(from: Int, to: Int): Int {
             if (neighborDistance != -1) distances.add(1 + neighborDistance)
         }
 
-        return distances.min() ?: -1
+        val minDistance = distances.min()
+        if (minDistance != null) actualDistances[Pair(from, to)] = minDistance
+
+        return minDistance ?: -1
     }
 
     return calculate(from, to)
@@ -68,7 +75,7 @@ private fun getRandomNodes(): Set<Int> {
 class DistanceCalculator(private val node1: Int, private val node2: Int) : Runnable {
     override fun run() {
         val distance = calculateShortestDistance(node1, node2)
-        if (distance > 0) calculatedDistances.add(distance)
+        if (distance > 0) targetNodesDistances.add(distance)
     }
 }
 
