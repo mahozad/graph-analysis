@@ -3,6 +3,7 @@ package ir.ac.yazd
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardOpenOption.APPEND
 
 private val sourceFilePath = Path.of("src/main/resources/graph.txt")
 
@@ -16,12 +17,14 @@ private fun extractNodesOutEdges() {
             { it.substringBefore(" ").toInt() },
             { it.substringAfter(" ").toInt() }
     )
-    File("src/main/resources/out-edges.txt").writeText(
-            graph.entries.joinToString(
-                    separator = "\r\n",
-                    transform = { "${it.key}->${it.value.joinToString(" ")}" }
-            )
-    )
+
+    for (file in File("src/main/resources/edges/out/").listFiles()) file.delete()
+
+    graph.entries.forEach {
+        val file = File("src/main/resources/edges/out/${it.key % 1000}.txt")
+        if (!file.exists()) file.createNewFile()
+        Files.writeString(file.toPath(),"${it.key}->${it.value.joinToString(" ")}\r\n", APPEND)
+    }
 }
 
 private fun extractNodesInEdges() {
@@ -29,10 +32,12 @@ private fun extractNodesInEdges() {
             { it.substringAfter(" ").toInt() },
             { it.substringBefore(" ").toInt() }
     )
-    File("src/main/resources/in-edges.txt").writeText(
-            graph.entries.joinToString(
-                    separator = "\r\n",
-                    transform = { "${it.key}<-${it.value.joinToString(" ")}" }
-            )
-    )
+
+    for (file in File("src/main/resources/edges/in/").listFiles()) file.delete()
+
+    graph.entries.forEach {
+        val file = File("src/main/resources/edges/in/${it.key % 1000}.txt")
+        if (!file.exists()) file.createNewFile()
+        Files.writeString(file.toPath(),"${it.key}<-${it.value.joinToString(" ")}\r\n", APPEND)
+    }
 }
