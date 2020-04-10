@@ -15,7 +15,7 @@ private val graph = Files.newBufferedReader(sourceFilePath)
     )
 
 //private val graphNodes = Files.newBufferedReader(sourceFilePath).lineSequence().map { it.substringBefore(" ").toInt() }.toSet()
-private val distances = synchronizedList(ArrayList<Int>())
+private val calculatedDistances = synchronizedList(ArrayList<Int>())
 
 fun main() {
     val executorService = Executors.newFixedThreadPool(4)
@@ -32,7 +32,7 @@ fun main() {
     }
 
     executorService.awaitTermination(30, TimeUnit.DAYS)
-    println((distances.reduce { total, distance -> total + distance } / distances.size))
+    println((calculatedDistances.reduce { total, distance -> total + distance } / calculatedDistances.size))
 }
 
 /**
@@ -68,8 +68,7 @@ private fun getRandomNodes(): Set<Int> {
 class DistanceCalculator(private val node1: Int, private val node2: Int) : Runnable {
     override fun run() {
         val distance = calculateShortestDistance(node1, node2)
-        if (distance > 0) distances.add(distance)
-        println(distances.size)
+        if (distance > 0) calculatedDistances.add(distance)
     }
 }
 
