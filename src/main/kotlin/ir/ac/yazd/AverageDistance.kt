@@ -2,6 +2,8 @@ package ir.ac.yazd
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.time.Duration
+import java.time.Instant
 import java.util.Collections.synchronizedList
 import java.util.Collections.synchronizedMap
 import java.util.concurrent.Executors
@@ -20,15 +22,19 @@ private val actualDistances = synchronizedMap(HashMap<Pair<Int, Int>, Int>())
 private val targetNodesDistances = synchronizedList(ArrayList<Int>())
 
 fun main() {
+    val startTime = Instant.now()
     val executorService = Executors.newFixedThreadPool(4)
 
     val nodes = getRandomNodes()
-    for (i in nodes.indices) executorService.submit(DistanceCalculator(nodes.elementAt(1), nodes.elementAt(i)))
+    for (i in nodes.indices) {
+        executorService.submit(DistanceCalculator(nodes.elementAt(i), nodes.elementAt(nodes.size - i - 1)))
+    }
 
     executorService.shutdown()
     executorService.awaitTermination(1, DAYS)
 
-    println((targetNodesDistances.reduce { total, distance -> total + distance } / targetNodesDistances.size))
+    println("Average distance: ${targetNodesDistances.reduce { total, distance -> total + distance } / targetNodesDistances.size}")
+    println("Time: ${Duration.between(startTime, Instant.now()).toSeconds()}s")
 }
 
 /**
@@ -61,7 +67,7 @@ private fun calculateShortestDistance(from: Int, to: Int): Int {
 
 private fun getRandomNodes(): Set<Int> {
     val nodes = mutableSetOf<Int>()
-    for (i in 0..1000) nodes.add(graph.keys.random())
+    while (nodes.size < 2000) nodes.add(graph.keys.random())
     return nodes
 }
 
