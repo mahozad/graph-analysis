@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Songs</title>
+    <title>Power Law</title>
     <link rel="icon" href="src/main/resources/logo.svg">
     <link rel="stylesheet" href="src/main/resources/css/Chart.min.css">
 </head>
@@ -13,8 +13,12 @@
 <body>
 
 <header>
-    <h1 style="margin:32px; text-align: center;">PowerLaw</h1>
-    <h3 th:text="|Time: ${time.toSeconds()}s|" style="margin:24px; text-align: center;"></h3>
+    <h1 style="margin-top:16px; text-align: center;">Power Law</h1>
+    <h3 style="text-align: center;"><span>Total time:</span> <span th:text="${time.toSeconds()}"></span>s</h3>
+    <h3 style="text-align: center;">
+        <span>Alpha:</span> <span th:text="${#numbers.formatDecimal(alpha, 1, 2)}" style="color: #F1444B;"></span>
+        <span>Gamma:</span> <span th:text="${#numbers.formatDecimal(gamma, 1, 2)}" style="color: #49D43C;"></span>
+    </h3>
 </header>
 
 <main style="width: 1600px; height: 800px; margin: auto">
@@ -37,7 +41,7 @@
             datasets: [{
                 label: "Frequency of Nodes by Edge Count",
                 data: edgeCountFreq,
-                borderColor: "#4a3bd2",
+                borderColor: "#4A3BD2",
                 fill: false
             }]
         },

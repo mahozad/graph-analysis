@@ -31,11 +31,14 @@ private fun determineIfAdheresPowerLaw1() {
     val edgeCounts = generateListOfIngoingEdgeCount()
     val edgeCountFreq = mergeEdgeCounts(edgeCounts)
     val result = filterOnlyPowersOf10(edgeCountFreq)
+    val (alpha, gamma) = calculateAlphaAndGamma(edgeCountFreq)
 
     val thContext = Context()
+    thContext.setVariable("alpha", alpha)
+    thContext.setVariable("gamma", gamma)
+    thContext.setVariable("time", Duration.between(startTime, Instant.now()))
     thContext.setVariable("edgeCounts", result.map { it.first })
     thContext.setVariable("edgeCountFreq", result.map { log10(it.second.toDouble()) })
-    thContext.setVariable("time", Duration.between(startTime, Instant.now()))
 
     setupTemplateEngine(thContext)
 
@@ -89,6 +92,18 @@ private fun mergeEdgeCounts(list: List<Int>) = list
 
 private fun filterOnlyPowersOf10(edgeCountFreq: List<Pair<Int, Int>>) = edgeCountFreq.filter {
     it.first == 1 || it.first == 10 || it.first == 100 || it.first == 1000 || it.first == 10000 || it.first == 100000
+}
+
+// https://math.stackexchange.com/questions/410894/power-law-probability-distribution-from-observations
+private fun calculateAlphaAndGamma(edgeCountFreq: List<Pair<Int, Int>>): Pair<Double, Double> {
+    var denominator = 0.0
+    for (freq in edgeCountFreq) denominator += 2 * log10(freq.second.toDouble())
+    val gamma = 1 + (edgeCountFreq.size / denominator)
+
+    val sampleElement = edgeCountFreq.first()
+    val alpha = gamma * log10(sampleElement.first.toDouble()) + log10(sampleElement.second.toDouble())
+
+    return Pair(alpha, gamma)
 }
 
 private fun setupTemplateEngine(thContext: Context): TemplateEngine {
