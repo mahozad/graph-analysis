@@ -14,11 +14,11 @@
 
 <header>
     <h1 style="margin-top:16px; text-align: center;">Power Law</h1>
-    <h3 style="text-align: center;"><span>Total time:</span> <span th:text="${time.toSeconds()}"></span>s</h3>
     <h3 style="text-align: center;">
         <span>Alpha:</span> <span th:text="${#numbers.formatDecimal(alpha, 1, 2)}" style="color: #F1444B;"></span>
         <span>Gamma:</span> <span th:text="${#numbers.formatDecimal(gamma, 1, 2)}" style="color: #49D43C;"></span>
     </h3>
+    <h3 style="text-align: center;"><span>Total time:</span> <span th:text="${time.toSeconds()}"></span>s</h3>
 </header>
 
 <main style="width: 1600px; height: 800px; margin: auto">

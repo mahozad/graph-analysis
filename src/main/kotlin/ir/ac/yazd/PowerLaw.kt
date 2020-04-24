@@ -38,34 +38,39 @@ private fun generateListOfIngoingEdgeCount(): List<Int> {
         .map { it.value.size }
 }
 
-private fun groupEdgeCounts(list: List<Int>) = list
-    .groupBy { it }
-    .entries.sortedBy { it.key }
-    .map { Pair(it.key, it.value.size) }
+// Map edge size to number of nodes that have that edge size
+private fun groupEdgeCounts(list: List<Int>) = list.groupBy { it }.mapValues { it.value.size }.toSortedMap()
 
-private fun filterOnlyPowersOf10(edgeCountFreq: List<Pair<Int, Int>>) = edgeCountFreq.filter {
-    it.first == 1 || it.first == 10 || it.first == 100 || it.first == 1000 || it.first == 10000 || it.first == 100000
+private fun filterOnlyPowersOf10(edgeCountFreq: Map<Int, Int>) = edgeCountFreq.filter {
+    it.key == 1 || it.key == 10 || it.key == 100 || it.key == 1000 || it.key == 10000 || it.key == 100000
 }
 
 // https://math.stackexchange.com/questions/410894/power-law-probability-distribution-from-observations
-private fun calculateAlphaAndGamma(edgeCountFreq: List<Pair<Int, Int>>): Pair<Double, Double> {
-    var denominator = 0.0
-    for (freq in edgeCountFreq) denominator += 2 * log10(freq.second.toDouble())
-    val gamma = 1 + (edgeCountFreq.size / denominator)
+private fun calculateAlphaAndGamma(edgeCountFreq: Map<Int, Int>): Pair<Double, Double> {
+    fun calculateGamma(): Double {
+        var denominator = 0.0
+        for (ecf in edgeCountFreq) denominator += 2 * log10(ecf.value.toDouble())
+        return 1 + (edgeCountFreq.size / denominator)
+    }
 
-    val sampleElement = edgeCountFreq.first()
-    val alpha = gamma * log10(sampleElement.first.toDouble()) + log10(sampleElement.second.toDouble())
+    fun calculateAlpha(gamma: Double): Double {
+        val sampleElement = edgeCountFreq.entries.iterator().next()
+        return gamma * log10(sampleElement.key.toDouble()) + log10(sampleElement.value.toDouble())
+    }
+
+    val gamma = calculateGamma()
+    val alpha = calculateAlpha(gamma)
 
     return Pair(alpha, gamma)
 }
 
-private fun generateTheResultOutput(data: List<Pair<Int, Int>>, alpha: Double, gamma: Double, startTime: Instant) {
+private fun generateTheResultOutput(data: Map<Int, Int>, alpha: Double, gamma: Double, startTime: Instant) {
     val thContext = Context()
     thContext.setVariable("time", Duration.between(startTime, Instant.now()))
     thContext.setVariable("alpha", alpha)
     thContext.setVariable("gamma", gamma)
-    thContext.setVariable("edgeCounts", data.map { it.first })
-    thContext.setVariable("edgeCountFreq", data.map { log10(it.second.toDouble()) })
+    thContext.setVariable("edgeCounts", data.map { it.key })
+    thContext.setVariable("edgeCountFreq", data.map { log10(it.value.toDouble()) })
 
     val stringWriter = StringWriter()
     val templateResolver = FileTemplateResolver().apply { templateMode = HTML }
