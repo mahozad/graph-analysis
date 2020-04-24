@@ -7,6 +7,8 @@ import org.thymeleaf.templateresolver.FileTemplateResolver
 import java.io.StringWriter
 import java.nio.file.Files
 import java.nio.file.Path
+import java.time.Duration
+import java.time.Instant
 import kotlin.math.log10
 import kotlin.math.pow
 
@@ -24,6 +26,8 @@ fun main() {
 }
 
 private fun determineIfAdheresPowerLaw1() {
+    val startTime = Instant.now()
+
     val edgeCounts = generateListOfIngoingEdgeCount()
     val edgeCountFreq = mergeEdgeCounts(edgeCounts).filter {
         // Filter only powers of ten
@@ -38,6 +42,8 @@ private fun determineIfAdheresPowerLaw1() {
     setupTemplateEngine(thContext)
 
     Files.newBufferedWriter(outputFilePath).use { writer -> writer.write(stringWriter.toString()) }
+
+    println("Time: ${Duration.between(startTime, Instant.now()).toSeconds()}s")
 }
 
 private fun determineIfAdheresPowerLaw2() {
