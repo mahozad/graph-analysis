@@ -12,13 +12,10 @@ import java.util.concurrent.TimeUnit.DAYS
 private val sourceFilePath = Path.of("src/main/resources/graph.txt")
 private val graph = Files.newBufferedReader(sourceFilePath)
     .lineSequence()
-    .groupBy(
-        { it.substringBefore(" ").toInt() },
-        { it.substringAfter(" ").toInt() }
-    )
+    .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
 
 //private val graphNodes = Files.newBufferedReader(sourceFilePath).lineSequence().map { it.substringBefore(" ").toInt() }.toSet()
-private val actualDistances = synchronizedMap(HashMap<Pair<Int, Int>, Int>())
+private val allDistancesFoundSoFar = synchronizedMap(HashMap<Pair<Int, Int>, Int>())
 private val targetNodesDistances = synchronizedList(ArrayList<Int>())
 
 fun main() {
@@ -44,9 +41,9 @@ private fun calculateShortestDistance(from: Int, to: Int): Int {
     val visited = mutableSetOf<Int>()
     fun calculate(from: Int, to: Int): Int {
         if (from == to) return 0
-        if (!graph.keys.contains(from)) return -1 // if statement required
+        if (!graph.keys.contains(from)) return -1 // This statement is required
         if (graph.getValue(from).contains(to)) return +1
-        if (actualDistances.keys.contains(Pair(from, to))) return actualDistances[Pair(from, to)]!!
+        if (allDistancesFoundSoFar.keys.contains(Pair(from, to))) return allDistancesFoundSoFar[Pair(from, to)]!!
 
         visited.add(from)
         val distances = mutableListOf<Int>()
@@ -57,7 +54,7 @@ private fun calculateShortestDistance(from: Int, to: Int): Int {
         }
 
         val minDistance = distances.min()
-        if (minDistance != null) actualDistances[Pair(from, to)] = minDistance
+        if (minDistance != null) allDistancesFoundSoFar[Pair(from, to)] = minDistance
 
         return minDistance ?: -1
     }
