@@ -14,7 +14,6 @@ import kotlin.math.log10
 private val sourceFilePath = Path.of("src/main/resources/graph.txt")
 private val outputFilePath = Path.of("result.html")
 private val templateFilePath = Path.of("src/main/resources/html/template.html")
-private val stringWriter = StringWriter()
 
 // You can use a VM option named ss to adjust the maximum stack size.
 // A VM option is usually passed using -X{option}. So you can use java -Xss1M to set the maximum of
@@ -23,21 +22,12 @@ private val stringWriter = StringWriter()
 fun main() {
     val startTime = Instant.now()
 
-    val edgeCounts = generateListOfIngoingEdgeCount()
-    val edgeCountFreq = mergeEdgeCounts(edgeCounts)
-    val result = filterOnlyPowersOf10(edgeCountFreq)
+    val edgeCountList = generateListOfIngoingEdgeCount()
+    val edgeCountFreq = groupEdgeCounts(edgeCountList)
+    val data = filterOnlyPowersOf10(edgeCountFreq)
     val (alpha, gamma) = calculateAlphaAndGamma(edgeCountFreq)
 
-    val thContext = Context()
-    thContext.setVariable("alpha", alpha)
-    thContext.setVariable("gamma", gamma)
-    thContext.setVariable("time", Duration.between(startTime, Instant.now()))
-    thContext.setVariable("edgeCounts", result.map { it.first })
-    thContext.setVariable("edgeCountFreq", result.map { log10(it.second.toDouble()) })
-
-    setupTemplateEngine(thContext)
-
-    Files.newBufferedWriter(outputFilePath).use { writer -> writer.write(stringWriter.toString()) }
+    generateTheResultOutput(data, alpha, gamma, startTime)
 }
 
 private fun generateListOfIngoingEdgeCount(): List<Int> {
@@ -48,7 +38,7 @@ private fun generateListOfIngoingEdgeCount(): List<Int> {
         .map { it.value.size }
 }
 
-private fun mergeEdgeCounts(list: List<Int>) = list
+private fun groupEdgeCounts(list: List<Int>) = list
     .groupBy { it }
     .entries.sortedBy { it.key }
     .map { Pair(it.key, it.value.size) }
@@ -69,9 +59,18 @@ private fun calculateAlphaAndGamma(edgeCountFreq: List<Pair<Int, Int>>): Pair<Do
     return Pair(alpha, gamma)
 }
 
-private fun setupTemplateEngine(thContext: Context): TemplateEngine {
+private fun generateTheResultOutput(data: List<Pair<Int, Int>>, alpha: Double, gamma: Double, startTime: Instant) {
+    val thContext = Context()
+    thContext.setVariable("time", Duration.between(startTime, Instant.now()))
+    thContext.setVariable("alpha", alpha)
+    thContext.setVariable("gamma", gamma)
+    thContext.setVariable("edgeCounts", data.map { it.first })
+    thContext.setVariable("edgeCountFreq", data.map { log10(it.second.toDouble()) })
+
+    val stringWriter = StringWriter()
     val templateResolver = FileTemplateResolver().apply { templateMode = HTML }
     val templateEngine = TemplateEngine().apply { setTemplateResolver(templateResolver) }
     templateEngine.process(templateFilePath.toString(), thContext, stringWriter)
-    return templateEngine
+
+    Files.newBufferedWriter(outputFilePath).use { writer -> writer.write(stringWriter.toString()) }
 }
