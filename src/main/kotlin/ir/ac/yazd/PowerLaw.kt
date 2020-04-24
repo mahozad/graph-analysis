@@ -12,7 +12,7 @@ import java.time.Instant
 import kotlin.math.log10
 import kotlin.math.pow
 
-private val sourceFilePath = Path.of("src/main/resources/sample-graph.txt")
+private val sourceFilePath = Path.of("src/main/resources/graph.txt")
 private val outputFilePath = Path.of("result.html")
 private val templateFilePath = Path.of("src/main/resources/html/template.html")
 private val stringWriter = StringWriter()
@@ -29,21 +29,17 @@ private fun determineIfAdheresPowerLaw1() {
     val startTime = Instant.now()
 
     val edgeCounts = generateListOfIngoingEdgeCount()
-    val edgeCountFreq = mergeEdgeCounts(edgeCounts).filter {
-        // Filter only powers of ten
-        it.first == 1 || it.first == 10 || it.first == 100 || it.first == 1000 ||
-                it.first == 10000 || it.first == 100000 || it.first == 1000000
-    }
+    val edgeCountFreq = mergeEdgeCounts(edgeCounts)
+    val result = filterOnlyPowersOf10(edgeCountFreq)
 
     val thContext = Context()
-    thContext.setVariable("edgeCounts", edgeCountFreq.map { it.first })
-    thContext.setVariable("edgeCountFreq", edgeCountFreq.map { log10(it.second.toDouble()) })
+    thContext.setVariable("edgeCounts", result.map { it.first })
+    thContext.setVariable("edgeCountFreq", result.map { log10(it.second.toDouble()) })
+    thContext.setVariable("time", Duration.between(startTime, Instant.now()))
 
     setupTemplateEngine(thContext)
 
     Files.newBufferedWriter(outputFilePath).use { writer -> writer.write(stringWriter.toString()) }
-
-    println("Time: ${Duration.between(startTime, Instant.now()).toSeconds()}s")
 }
 
 private fun determineIfAdheresPowerLaw2() {
@@ -90,6 +86,10 @@ private fun mergeEdgeCounts(list: List<Int>) = list
         .groupBy { it }
         .entries.sortedBy { it.key }
         .map { Pair(it.key, it.value.size) }
+
+private fun filterOnlyPowersOf10(edgeCountFreq: List<Pair<Int, Int>>) = edgeCountFreq.filter {
+    it.first == 1 || it.first == 10 || it.first == 100 || it.first == 1000 || it.first == 10000 || it.first == 100000
+}
 
 private fun setupTemplateEngine(thContext: Context): TemplateEngine {
     val templateResolver = FileTemplateResolver().apply { templateMode = HTML }

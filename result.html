@@ -3,26 +3,22 @@
 <html lang="en-US">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Songs</title>
-  <link rel="icon" href="src/main/resources/logo.svg">
-  <link rel="stylesheet" href="src/main/resources/css/Chart.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Songs</title>
+    <link rel="icon" href="src/main/resources/logo.svg">
+    <link rel="stylesheet" href="src/main/resources/css/Chart.min.css">
 </head>
 
 <body>
 
 <header>
-  <h1 class="title centered col-sm">Music repository</h1>
-  <section class="rep-info">
-    <div class="info">
-      <h2 class="info-title">Number of frequencies: 4</h2>
-    </div>
-  </section>
+    <h1 style="margin:32px; text-align: center;">PowerLaw</h1>
+    <h3 style="margin:24px; text-align: center;">Time: 43s</h3>
 </header>
 
 <main style="width: 1600px; height: 800px; margin: auto">
-  <canvas id="chart"></canvas>
+    <canvas id="chart"></canvas>
 </main>
 
 <script src="src/main/resources/js/Chart.min.js"></script>
@@ -39,11 +35,33 @@
         data: {
             labels: edgeCounts,
             datasets: [{
-                label: "Edge Count Frequency",
+                label: "Frequency of Nodes by Edge Count",
                 data: edgeCountFreq,
-                borderColor: "#4a55cc",
+                borderColor: "#4a3bd2",
                 fill: false
             }]
+        },
+        options: {
+            scales: {
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Edge Count',
+                        fontStyle : 'bold',
+                        fontSize : 18
+                    },
+                    ticks: {callback: (label) => `10^${Math.log10(label)}`}
+                }],
+                yAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Number of Nodes',
+                        fontStyle : 'bold',
+                        fontSize : 18
+                    },
+                    ticks: {callback: (label) => `10^${label}`}
+                }]
+            }
         }
     });
 </script>
