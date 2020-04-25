@@ -30,8 +30,8 @@ fun main() {
     executorService.shutdown()
     executorService.awaitTermination(1, DAYS)
 
-    println("Size: ${targetNodesDistances.size}")
-    println("Average distance: ${targetNodesDistances.reduce { total, distance -> total + distance } / targetNodesDistances.size}")
+    println("Number of connected nodes: ${targetNodesDistances.size}")
+    println("Average distance: ${targetNodesDistances.average()}")
     println("Time: ${Duration.between(startTime, Instant.now()).toMinutes()}m")
 }
 
