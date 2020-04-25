@@ -15,16 +15,15 @@ fun main() {
 
     constructGraphs()
     val coreNodes = extractCore()
-    println("Core size: ${coreNodes.size}")
-
     /*re*/constructGraphs()
     val outNodes = extractOut(coreNodes)
     val inNodes = extractIn(coreNodes)
+
+    println("Core size: ${coreNodes.size}")
     println("Out size: ${outNodes.size}")
     println("In size: ${inNodes.size}")
-
-    val duration = Duration.between(startTime, Instant.now())
-    println("Time: ${duration.toSeconds()}s")
+    println("Other: ${(graph.size) - (coreNodes.size + outNodes.size + inNodes.size)}")
+    println("Time: ${Duration.between(startTime, Instant.now()).toSeconds()}s")
 }
 
 private fun extractCore(): Set<Int> {
