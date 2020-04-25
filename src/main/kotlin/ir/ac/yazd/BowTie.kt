@@ -23,8 +23,8 @@ fun main() {
 private fun partitionNodes() {
     while (graph.isNotEmpty()) {
         val node = graph.keys.random()
-        val nodeReachable = findNodesReachableToOrFrom(graph, node) // Those that can reach from node
-        val nodeReaching = findNodesReachableToOrFrom(graphReverse, node) // Those that can reach to node
+        val nodeReachable = findNodesReachableFrom(node) // Those that can be reached from this node
+        val nodeReaching = findNodesReachingTo(node) // Those that can reach to this node
 
         val stronglyConnectedComponent = setOf(node) union (nodeReachable intersect nodeReaching)
         graph.keys.removeAll(stronglyConnectedComponent)
@@ -37,7 +37,11 @@ private fun partitionNodes() {
     }
 }
 
-fun findNodesReachableToOrFrom(graph: Map<Int, List<Int>>, node: Int): Set<Int> {
+fun findNodesReachableFrom(node: Int) = findNodeLineage(graph, node)
+
+fun findNodesReachingTo(node: Int) = findNodeLineage(graphReverse, node)
+
+fun findNodeLineage(graph: Map<Int, List<Int>>, node: Int): Set<Int> {
     val result = mutableSetOf<Int>()
     val visited = mutableSetOf<Int>()
 
