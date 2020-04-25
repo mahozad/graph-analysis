@@ -9,33 +9,32 @@ private val sourceFilePath = Path.of("src/main/resources/graph.txt")
 private lateinit var graph: MutableMap<Int, List<Int>>
 private lateinit var graphReverse: MutableMap<Int, List<Int>>
 
-// -Xmx4096m -Xss128m
+// VM options: -Xmx4096m -Xss64m
 fun main() {
-    constructGraphs()
-    determineIfGraphIsBowTie()
-}
-
-private fun determineIfGraphIsBowTie() {
     val startTime = Instant.now()
 
+    constructGraphs()
+    partitionNodes()
+
+    val duration = Duration.between(startTime, Instant.now())
+    println("Time: ${duration.toMinutes()}m ${duration.toSeconds() % 60}s")
+}
+
+private fun partitionNodes() {
     while (graph.isNotEmpty()) {
         val node = graph.keys.random()
         val nodeReachable = findNodesReachableToOrFrom(graph, node) // Those that can reach from node
         val nodeReaching = findNodesReachableToOrFrom(graphReverse, node) // Those that can reach to node
 
-        val stronglyConnectedComponent = (nodeReachable intersect nodeReaching) union setOf(node)
-        stronglyConnectedComponent.forEach {
-            graph.remove(it)
-            graphReverse.remove(it)
-        }
+        val stronglyConnectedComponent = setOf(node) union (nodeReachable intersect nodeReaching)
+        graph.keys.removeAll(stronglyConnectedComponent)
+        graphReverse.keys.removeAll(stronglyConnectedComponent)
 
         if (stronglyConnectedComponent.size > 1000) {
             println("Found a new connected component with size ${stronglyConnectedComponent.size}")
             println("Remaining nodes: ${graph.size}")
         }
     }
-
-    println("Time: ${Duration.between(startTime, Instant.now()).toMinutes()}m")
 }
 
 fun findNodesReachableToOrFrom(graph: Map<Int, List<Int>>, node: Int): Set<Int> {
