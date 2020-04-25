@@ -8,11 +8,11 @@ import java.util.*
 
 private val sourceFilePath = Path.of("src/main/resources/sample-graph.txt")
 private lateinit var graph: Map<Int, List<Int>>
-private lateinit var graphConverse: Map<Int, List<Int>>
+private lateinit var graphReverse: Map<Int, List<Int>>
 
 // -Xmx4096m -Xss128m
 fun main() {
-    readGraph()
+    constructGraphs()
     determineIfGraphIsBowTie()
 }
 
@@ -22,8 +22,8 @@ private fun determineIfGraphIsBowTie() {
     val queue: Queue<Int> = ArrayDeque(graph.keys)
     while (queue.isNotEmpty()) {
         val node = queue.remove()
-        val nodeReachables = findNodesReachableToOrFrom(graph, node)
-        val nodeReachings = findNodesReachableToOrFrom(graphConverse, node)
+        val nodeReachables = findNodesReachableToOrFrom(graph, node) // reachable from
+        val nodeReachings = findNodesReachableToOrFrom(graphReverse, node) // reachable to
 
         val ssc = nodeReachables.intersect(nodeReachings).union(setOf(node))
         queue.removeAll(ssc)
@@ -52,11 +52,11 @@ fun findNodesReachableToOrFrom(graph:Map<Int, List<Int>>, node: Int): Set<Int> {
     return run(node)
 }
 
-fun readGraph() {
+fun constructGraphs() {
     graph = Files.newBufferedReader(sourceFilePath)
         .lineSequence()
         .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
-    graphConverse = Files.newBufferedReader(sourceFilePath)
+    graphReverse = Files.newBufferedReader(sourceFilePath)
         .lineSequence()
         .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
 }
