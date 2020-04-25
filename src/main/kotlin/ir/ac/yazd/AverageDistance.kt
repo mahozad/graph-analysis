@@ -4,10 +4,13 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
 import java.time.Instant
+import java.util.*
 import java.util.Collections.synchronizedList
 import java.util.Collections.synchronizedMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit.DAYS
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 private val sourceFilePath = Path.of("src/main/resources/graph.txt")
 private val graph = Files.newBufferedReader(sourceFilePath)
@@ -23,43 +26,51 @@ fun main() {
     val executorService = Executors.newFixedThreadPool(4)
 
     val nodes = getRandomNodes()
-    for (i in nodes.indices) {
+    for (i in 0 until 1000) {
         executorService.submit(DistanceCalculator(nodes.elementAt(i), nodes.elementAt(nodes.size - i - 1)))
     }
 
     executorService.shutdown()
     executorService.awaitTermination(1, DAYS)
 
+    println("Size: ${targetNodesDistances.size}")
     println("Average distance: ${targetNodesDistances.reduce { total, distance -> total + distance } / targetNodesDistances.size}")
-    println("Time: ${Duration.between(startTime, Instant.now()).toSeconds()}s")
+    println("Time: ${Duration.between(startTime, Instant.now()).toMinutes()}m")
 }
 
 /**
  * Uses BFS (Breadth-First-Search) algorithm.
  */
 private fun calculateShortestDistance(from: Int, to: Int): Int {
-    val visited = mutableSetOf<Int>()
-    fun calculate(from: Int, to: Int): Int {
-        if (from == to) return 0
-        if (!graph.keys.contains(from)) return -1 // This statement is required
-        if (graph.getValue(from).contains(to)) return +1
-        if (allDistancesFoundSoFar.keys.contains(Pair(from, to))) return allDistancesFoundSoFar[Pair(from, to)]!!
+    if (from == to) return 0
+    if (graph.getValue(from).contains(to)) return +1
+    if (allDistancesFoundSoFar.keys.contains(Pair(from, to))) return allDistancesFoundSoFar[Pair(from, to)]!!
 
-        visited.add(from)
-        val distances = mutableListOf<Int>()
-        for (neighbor in graph.getValue(from)) {
-            if (visited.contains(neighbor)) continue
-            val neighborDistance = calculate(neighbor, to)
-            if (neighborDistance != -1) distances.add(1 + neighborDistance)
+    val queue: Queue<Int> = LinkedList()
+    queue.add(from)
+    queue.add(null)
+    var depth = 1
+    val visited = mutableSetOf<Int>()
+
+    while (queue.isNotEmpty()) {
+        val next = queue.remove()
+        if (next == null) {
+            depth++
+            continue
         }
 
-        val minDistance = distances.min()
-        if (minDistance != null) allDistancesFoundSoFar[Pair(from, to)] = minDistance
+        if (visited.contains(next)) continue
+        if (!graph.keys.contains(next)) {
+            visited.add(next)
+            continue
+        }
+        if (graph.getValue(next).contains(to)) return depth
 
-        return minDistance ?: -1
+        visited.add(next)
+        queue.addAll(graph.getValue(next))
+        if (queue.element() == null) queue.add(null) // All nodes of this level finished so add flag for next level
     }
-
-    return calculate(from, to)
+    return -1
 }
 
 private fun getRandomNodes(): Set<Int> {
