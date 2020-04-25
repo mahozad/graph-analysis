@@ -17,6 +17,7 @@ private val graph = Files.newBufferedReader(sourceFilePath)
 
 private val targetNodesDistances = synchronizedList(ArrayList<Int>())
 
+// VM options: -Xmx4096m -Xss128m
 fun main() {
     val startTime = Instant.now()
     val executorService = Executors.newFixedThreadPool(4)
