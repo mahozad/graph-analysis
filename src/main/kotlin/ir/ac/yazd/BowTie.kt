@@ -11,21 +11,20 @@ fun main() {
 }
 
 private fun determineIfGraphIsBowTie() {
-    val map = Files.newBufferedReader(sourceFilePath)
-            .lineSequence()
-            .take(100_000)
-            .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
+    val graph = Files.newBufferedReader(sourceFilePath)
+        .lineSequence()
+        .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
 
 
     val visiting = mutableSetOf<Int>()
     fun canFirstNodeReachTheSecondNode(first: Int, second: Int): Boolean {
-        if (!map.containsKey(first)) return false
+        if (!graph.containsKey(first)) return false
 
-        if (map.getValue(first).contains(second)) return true
+        if (graph.getValue(first).contains(second)) return true
 
         visiting.add(first)
         var isConnected = false
-        for (n in map.getValue(first)) {
+        for (n in graph.getValue(first)) {
             if (!visiting.contains(n)) {
                 isConnected = canFirstNodeReachTheSecondNode(n, second)
                 if (isConnected) break
@@ -35,7 +34,7 @@ private fun determineIfGraphIsBowTie() {
     }
 
 
-    val queue: Queue<Int> = ArrayDeque(map.keys)
+    val queue: Queue<Int> = ArrayDeque(graph.keys)
     val sets = mutableListOf(mutableSetOf(queue.element()))
     var currentSet = 0
 
@@ -51,7 +50,7 @@ private fun determineIfGraphIsBowTie() {
             currentSet++
             sets.add(mutableSetOf(node))
         }
-        for (target in map.getValue(node)) {
+        for (target in graph.getValue(node)) {
             visiting.clear()
             if (canFirstNodeReachTheSecondNode(target, node)) {
                 sets[currentSet].add(target)
