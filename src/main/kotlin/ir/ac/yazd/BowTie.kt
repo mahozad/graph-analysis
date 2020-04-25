@@ -6,8 +6,8 @@ import java.time.Duration
 import java.time.Instant
 
 private val sourceFilePath = Path.of("src/main/resources/graph.txt")
-private lateinit var graph: Map<Int, List<Int>>
-private lateinit var graphReverse: Map<Int, List<Int>>
+private lateinit var graph: MutableMap<Int, List<Int>>
+private lateinit var graphReverse: MutableMap<Int, List<Int>>
 
 // -Xmx4096m -Xss128m
 fun main() {
@@ -18,22 +18,25 @@ fun main() {
 private fun determineIfGraphIsBowTie() {
     val startTime = Instant.now()
 
-    val nodes: MutableSet<Int> = graph.keys.toMutableSet()
-    while (nodes.isNotEmpty()) {
-        val node = nodes.random().also { nodes.remove(it) }
+    while (graph.isNotEmpty()) {
+        val node = graph.keys.random()
         val nodeReachable = findNodesReachableToOrFrom(graph, node) // Those that can reach from node
         val nodeReaching = findNodesReachableToOrFrom(graphReverse, node) // Those that can reach to node
 
         val stronglyConnectedComponent = (nodeReachable intersect nodeReaching) union setOf(node)
-        nodes.removeAll(stronglyConnectedComponent)
+        stronglyConnectedComponent.forEach {
+            graph.remove(it)
+            graphReverse.remove(it)
+        }
 
-        println("A new connected component with size ${stronglyConnectedComponent.size}")
-        println("Remaining nodes: ${nodes.size}")
+        if (stronglyConnectedComponent.size > 1000) {
+            println("Found a new connected component with size ${stronglyConnectedComponent.size}")
+            println("Remaining nodes: ${graph.size}")
+        }
     }
 
     println("Time: ${Duration.between(startTime, Instant.now()).toMinutes()}m")
 }
-
 
 fun findNodesReachableToOrFrom(graph: Map<Int, List<Int>>, node: Int): Set<Int> {
     val result = mutableSetOf<Int>()
@@ -57,9 +60,12 @@ fun constructGraphs() {
     graph = Files.newBufferedReader(sourceFilePath)
         .lineSequence()
         .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
+        .toMutableMap()
+
     graphReverse = Files.newBufferedReader(sourceFilePath)
         .lineSequence()
         .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
+        .toMutableMap()
 }
 
 private fun Map<Int, List<Int>>.neighborsOf(node: Int) = getValue(node)
