@@ -26,12 +26,12 @@ fun main() {
     println("Time: ${Duration.between(startTime, Instant.now()).toSeconds()}s")
 }
 
-private fun extractCore(): Set<Int> {
+fun extractCore(): Set<Int> {
     val graphOrder = graph.size
     while (graph.isNotEmpty()) {
         val node = graph.keys.random()
-        val nodeReachable = findNodesReachableFrom(node) // Those that can be reached from this node
         val nodeReaching = findNodesReachingTo(node) // Those that can reach this node
+        val nodeReachable = findNodesReachableFrom(node) // Those that can be reached from this node
 
         val stronglyConnectedComponent = setOf(node) union (nodeReachable intersect nodeReaching)
         graph.keys.removeAll(stronglyConnectedComponent)
@@ -43,19 +43,15 @@ private fun extractCore(): Set<Int> {
     return emptySet()
 }
 
-private fun extractIn(core: Set<Int>): Set<Int> {
-    val aNodeFromCore = core.random()
-    return findNodesReachingTo(aNodeFromCore) - core
-}
+fun extractIn(core: Set<Int>) = findNodesReachingTo(core.random()) - core
 
-private fun extractOut(core: Set<Int>): Set<Int> {
-    val aNodeFromCore = core.random()
-    return findNodesReachableFrom(aNodeFromCore) - core
-}
+fun extractOut(core: Set<Int>) = findNodesReachableFrom(core.random()) - core
+
+fun findNodesReachingTo(node: Int) = findNodeLineage(graphReverse, node)
 
 fun findNodesReachableFrom(node: Int) = findNodeLineage(graph, node)
 
-fun findNodesReachingTo(node: Int) = findNodeLineage(graphReverse, node)
+fun Map<Int, List<Int>>.neighborsOf(node: Int) = getValue(node)
 
 fun findNodeLineage(graph: Map<Int, List<Int>>, node: Int): Set<Int> {
     val result = mutableSetOf<Int>()
@@ -86,5 +82,3 @@ fun constructGraphs() {
         .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
         .toMutableMap()
 }
-
-private fun Map<Int, List<Int>>.neighborsOf(node: Int) = getValue(node)
