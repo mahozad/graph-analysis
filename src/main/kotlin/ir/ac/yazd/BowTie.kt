@@ -14,27 +14,44 @@ fun main() {
     val startTime = Instant.now()
 
     constructGraphs()
-    partitionNodes()
+    val coreNodes = extractCore()
+    println("Core size: ${coreNodes.size}")
+
+    /*re*/constructGraphs()
+    val outNodes = extractOut(coreNodes)
+    val inNodes = extractIn(coreNodes)
+    println("Out size: ${outNodes.size}")
+    println("In size: ${inNodes.size}")
 
     val duration = Duration.between(startTime, Instant.now())
-    println("Time: ${duration.toMinutes()}m ${duration.toSeconds() % 60}s")
+    println("Time: ${duration.toSeconds()}s")
 }
 
-private fun partitionNodes() {
+private fun extractCore(): Set<Int> {
+    val graphOrder = graph.size
     while (graph.isNotEmpty()) {
         val node = graph.keys.random()
         val nodeReachable = findNodesReachableFrom(node) // Those that can be reached from this node
-        val nodeReaching = findNodesReachingTo(node) // Those that can reach to this node
+        val nodeReaching = findNodesReachingTo(node) // Those that can reach this node
 
         val stronglyConnectedComponent = setOf(node) union (nodeReachable intersect nodeReaching)
         graph.keys.removeAll(stronglyConnectedComponent)
         graphReverse.keys.removeAll(stronglyConnectedComponent)
 
-        if (stronglyConnectedComponent.size > 1000) {
-            println("Found a new connected component with size ${stronglyConnectedComponent.size}")
-            println("Remaining nodes: ${graph.size}")
-        }
+        // If the component size is big enough, it is probably the core
+        if (stronglyConnectedComponent.size > 0.40 * graphOrder) return stronglyConnectedComponent
     }
+    return emptySet()
+}
+
+private fun extractIn(core: Set<Int>): Set<Int> {
+    val aNodeFromCore = core.random()
+    return findNodesReachingTo(aNodeFromCore) - core
+}
+
+private fun extractOut(core: Set<Int>): Set<Int> {
+    val aNodeFromCore = core.random()
+    return findNodesReachableFrom(aNodeFromCore) - core
 }
 
 fun findNodesReachableFrom(node: Int) = findNodeLineage(graph, node)
