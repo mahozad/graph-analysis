@@ -4,59 +4,75 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 
-private val sourceFilePath = Path.of("src/main/resources/sample-graph.txt")
+private val sourceFilePath = Path.of("src/main/resources/graph.txt")
+private lateinit var graph: Map<Int, List<Int>>
 
+// -Xmx8192m -Xss1024m
 fun main() {
     determineIfGraphIsBowTie()
 }
 
 private fun determineIfGraphIsBowTie() {
-    val graph = Files.newBufferedReader(sourceFilePath)
-        .lineSequence()
-        .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
-
-
-    val visiting = mutableSetOf<Int>()
-    fun canFirstNodeReachTheSecondNode(first: Int, second: Int): Boolean {
-        if (!graph.containsKey(first)) return false
-
-        if (graph.getValue(first).contains(second)) return true
-
-        visiting.add(first)
-        var isConnected = false
-        for (n in graph.getValue(first)) {
-            if (!visiting.contains(n)) {
-                isConnected = canFirstNodeReachTheSecondNode(n, second)
-                if (isConnected) break
-            }
-        }
-        return isConnected
-    }
-
+    readGraph()
 
     val queue: Queue<Int> = ArrayDeque(graph.keys)
-    val sets = mutableListOf(mutableSetOf(queue.element()))
+    val sets = mutableListOf(mutableSetOf<Int>())
+    val visited = mutableSetOf<Int>()
     var currentSet = 0
-
-    fun isNodeInSets(node: Int): Boolean {
-        for (set in sets) if (set.contains(node)) return true
-        return false
-    }
-
-    while (!queue.isEmpty()) {
+    while (queue.isNotEmpty()) {
         val node = queue.remove()
-        visiting.clear()
-        if (!isNodeInSets(node) && !canFirstNodeReachTheSecondNode(sets[currentSet].first(), node)) {
-            currentSet++
-            sets.add(mutableSetOf(node))
-        }
-        for (target in graph.getValue(node)) {
-            visiting.clear()
-            if (canFirstNodeReachTheSecondNode(target, node)) {
-                sets[currentSet].add(target)
+        if (visited.contains(node)) continue
+        sets[currentSet].add(node)
+        visited.add(node)
+        if (!graph.containsKey(node)) continue // If has no outgoing ...
+        val thisClusterQueue = ArrayDeque(graph.neighborsOf(node))
+
+        while (thisClusterQueue.isNotEmpty()) {
+            val neighbor = thisClusterQueue.remove()
+            if (visited.contains(neighbor)) continue
+            if (canFirstNodeReachTheSecondNode(neighbor, node)) {
+                sets[currentSet].add(neighbor)
+                visited.add(neighbor)
+                queue.remove(neighbor)
+                thisClusterQueue.addAll(graph.neighborsOf(neighbor))
             }
         }
+
+        sets.add(mutableSetOf())
+        currentSet++
     }
 
     sets.forEach { println(it) }
+}
+
+fun readGraph() {
+    graph = Files.newBufferedReader(sourceFilePath)
+        .lineSequence()
+        .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
+}
+
+private fun Map<Int, List<Int>>.neighborsOf(node: Int) = getValue(node)
+
+fun canFirstNodeReachTheSecondNode(first: Int, second: Int): Boolean {
+    val visited = mutableSetOf<Int>()
+
+    fun run(first: Int, second: Int): Boolean {
+
+        if (!graph.containsKey(first)) return false
+        if (graph.neighborsOf(first).contains(second)) return true
+
+        visited.add(first)
+        var isConnected = false
+        for (neighbor in graph.neighborsOf(first)) {
+            if (!visited.contains(neighbor)) {
+                isConnected = run(neighbor, second)
+                if (isConnected) break
+            }
+        }
+
+        return isConnected
+    }
+
+    visited.clear()
+    return run(first, second)
 }
