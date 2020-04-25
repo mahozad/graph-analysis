@@ -17,7 +17,7 @@ private val templateFilePath = Path.of("src/main/resources/html/template.html")
 
 // You can use a VM option named ss to adjust the maximum stack size.
 // A VM option is usually passed using -X{option}. So you can use java -Xss1M to set the maximum of stack size to 1 Megabyte
-// Current options: -Xmx4096m -Xss128m
+// VM options: -Xmx4096m -Xss128m
 
 fun main() {
     val startTime = Instant.now()
