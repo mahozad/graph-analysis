@@ -10,6 +10,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit.DAYS
 import kotlin.collections.ArrayList
 
+private const val NUMBER_OF_SAMPLE_PAIRS = 1000
 private val sourceFilePath = Path.of("src/main/resources/graph.txt")
 private val graph = Files.newBufferedReader(sourceFilePath)
     .lineSequence()
@@ -23,7 +24,7 @@ fun main() {
     val executorService = Executors.newFixedThreadPool(4)
 
     val nodes = getRandomNodes()
-    for (i in 0 until 1000) {
+    for (i in 0 until NUMBER_OF_SAMPLE_PAIRS) {
         executorService.submit(DistanceCalculator(nodes.elementAt(i), nodes.elementAt(nodes.size - i - 1)))
     }
 
@@ -33,6 +34,13 @@ fun main() {
     println("Number of connected nodes: ${targetNodesDistances.size}")
     println("Average distance: ${targetNodesDistances.average()}")
     println("Time: ${Duration.between(startTime, Instant.now()).toMinutes()}m")
+}
+
+private class DistanceCalculator(private val node1: Int, private val node2: Int) : Runnable {
+    override fun run() {
+        val distance = calculateShortestDistance(node1, node2)
+        if (distance > 0) targetNodesDistances.add(distance)
+    }
 }
 
 // Uses BFS (Breadth-First-Search) algorithm.
@@ -70,15 +78,8 @@ private fun calculateShortestDistance(from: Int, to: Int): Int {
 
 private fun getRandomNodes(): Set<Int> {
     val nodes = mutableSetOf<Int>()
-    while (nodes.size < 2000) nodes.add(graph.keys.random())
+    while (nodes.size < NUMBER_OF_SAMPLE_PAIRS * 2) nodes.add(graph.keys.random())
     return nodes
-}
-
-class DistanceCalculator(private val node1: Int, private val node2: Int) : Runnable {
-    override fun run() {
-        val distance = calculateShortestDistance(node1, node2)
-        if (distance > 0) targetNodesDistances.add(distance)
-    }
 }
 
 private fun edgesOf(node: Int): Collection<Int> {
