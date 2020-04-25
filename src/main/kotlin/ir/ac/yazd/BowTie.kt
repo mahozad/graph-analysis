@@ -4,7 +4,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
 import java.time.Instant
-import java.util.*
 
 private val sourceFilePath = Path.of("src/main/resources/graph.txt")
 private lateinit var graph: Map<Int, List<Int>>
@@ -19,17 +18,17 @@ fun main() {
 private fun determineIfGraphIsBowTie() {
     val startTime = Instant.now()
 
-    val queue: Queue<Int> = ArrayDeque(graph.keys)
-    while (queue.isNotEmpty()) {
-        val node = queue.remove()
+    val nodes: MutableSet<Int> = graph.keys.toMutableSet()
+    while (nodes.isNotEmpty()) {
+        val node = nodes.random().also { nodes.remove(it) }
         val nodeReachable = findNodesReachableToOrFrom(graph, node) // Those that can reach from node
         val nodeReaching = findNodesReachableToOrFrom(graphReverse, node) // Those that can reach to node
 
-        val ssc = (nodeReachable intersect nodeReaching) union setOf(node)
-        queue.removeAll(ssc)
+        val stronglyConnectedComponent = (nodeReachable intersect nodeReaching) union setOf(node)
+        nodes.removeAll(stronglyConnectedComponent)
 
-        println("A new connected component with size ${ssc.size}")
-        println("Remaining nodes: ${queue.size}")
+        println("A new connected component with size ${stronglyConnectedComponent.size}")
+        println("Remaining nodes: ${nodes.size}")
     }
 
     println("Time: ${Duration.between(startTime, Instant.now()).toMinutes()}m")
