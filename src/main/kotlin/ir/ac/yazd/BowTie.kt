@@ -22,13 +22,13 @@ private fun determineIfGraphIsBowTie() {
     val queue: Queue<Int> = ArrayDeque(graph.keys)
     while (queue.isNotEmpty()) {
         val node = queue.remove()
-        val nodeReachables = findNodesReachableToOrFrom(graph, node) // can reach from node
-        val nodeReachings = findNodesReachableToOrFrom(graphReverse, node) // can reach to node
+        val nodeReachable = findNodesReachableToOrFrom(graph, node) // can reach from node
+        val nodeReaching = findNodesReachableToOrFrom(graphReverse, node) // can reach to node
 
-        val ssc = (nodeReachables intersect nodeReachings) union setOf(node)
+        val ssc = (nodeReachable intersect nodeReaching) union setOf(node)
         queue.removeAll(ssc)
 
-        println("A new connected component with size ${ssc.size}: $ssc")
+        println("A new connected component with size ${ssc.size}")
         println("Remaining nodes: ${queue.size}")
     }
 
