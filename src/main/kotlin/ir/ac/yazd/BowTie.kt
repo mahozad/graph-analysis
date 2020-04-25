@@ -6,7 +6,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.*
 
-private val sourceFilePath = Path.of("src/main/resources/sample-graph.txt")
+private val sourceFilePath = Path.of("src/main/resources/graph.txt")
 private lateinit var graph: Map<Int, List<Int>>
 private lateinit var graphReverse: Map<Int, List<Int>>
 
@@ -22,18 +22,21 @@ private fun determineIfGraphIsBowTie() {
     val queue: Queue<Int> = ArrayDeque(graph.keys)
     while (queue.isNotEmpty()) {
         val node = queue.remove()
-        val nodeReachables = findNodesReachableToOrFrom(graph, node) // reachable from
-        val nodeReachings = findNodesReachableToOrFrom(graphReverse, node) // reachable to
+        val nodeReachables = findNodesReachableToOrFrom(graph, node) // can reach from node
+        val nodeReachings = findNodesReachableToOrFrom(graphReverse, node) // can reach to node
 
-        val ssc = nodeReachables.intersect(nodeReachings).union(setOf(node))
+        val ssc = (nodeReachables intersect nodeReachings) union setOf(node)
         queue.removeAll(ssc)
+
+        println("A new connected component with size ${ssc.size}: $ssc")
+        println("Remaining nodes: ${queue.size}")
     }
 
     println("Time: ${Duration.between(startTime, Instant.now()).toMinutes()}m")
 }
 
 
-fun findNodesReachableToOrFrom(graph:Map<Int, List<Int>>, node: Int): Set<Int> {
+fun findNodesReachableToOrFrom(graph: Map<Int, List<Int>>, node: Int): Set<Int> {
     val result = mutableSetOf<Int>()
     val visited = mutableSetOf<Int>()
 
@@ -41,10 +44,9 @@ fun findNodesReachableToOrFrom(graph:Map<Int, List<Int>>, node: Int): Set<Int> {
         if (!graph.containsKey(node)) return result
         visited.add(node)
         for (neighbor in graph.neighborsOf(node)) {
-            if (!visited.contains(neighbor)) {
-                result.add(neighbor)
-                run(neighbor)
-            }
+            if (visited.contains(neighbor)) continue
+            result.add(neighbor)
+            run(neighbor)
         }
         return result
     }
