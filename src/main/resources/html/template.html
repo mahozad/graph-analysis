@@ -54,7 +54,7 @@
                         fontStyle : 'bold',
                         fontSize : 18
                     },
-                    ticks: {callback: (label) => `10^${Math.log10(label)}`}
+                    ticks: {callback: label => `10^${label}`}
                 }],
                 yAxes: [{
                     scaleLabel: {
@@ -63,7 +63,7 @@
                         fontStyle : 'bold',
                         fontSize : 18
                     },
-                    ticks: {callback: (label) => `10^${label}`}
+                    ticks: {callback: label => `10^${label}`}
                 }]
             }
         }

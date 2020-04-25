@@ -69,7 +69,7 @@ private fun generateTheResultOutput(data: Map<Int, Int>, alpha: Double, gamma: D
     thContext.setVariable("time", Duration.between(startTime, Instant.now()))
     thContext.setVariable("alpha", alpha)
     thContext.setVariable("gamma", gamma)
-    thContext.setVariable("edgeCounts", data.map { it.key })
+    thContext.setVariable("edgeCounts", data.map { log10(it.key.toDouble()) })
     thContext.setVariable("edgeCountFreq", data.map { log10(it.value.toDouble()) })
 
     val stringWriter = StringWriter()

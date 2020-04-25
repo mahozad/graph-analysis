@@ -27,7 +27,7 @@
 
 <script src="src/main/resources/js/Chart.min.js"></script>
 <script>
-    let edgeCounts = [1,10,100,1000];
+    let edgeCounts = [0.0,1.0,2.0,3.0];
     let edgeCountFreq = [5.491972078870857,3.9744656357372423,2.660865478003869,0.0];
 
     let cxt = document.getElementById("chart").getContext("2d");
@@ -54,7 +54,7 @@
                         fontStyle : 'bold',
                         fontSize : 18
                     },
-                    ticks: {callback: (label) => `10^${Math.log10(label)}`}
+                    ticks: {callback: label => `10^${label}`}
                 }],
                 yAxes: [{
                     scaleLabel: {
@@ -63,7 +63,7 @@
                         fontStyle : 'bold',
                         fontSize : 18
                     },
-                    ticks: {callback: (label) => `10^${label}`}
+                    ticks: {callback: label => `10^${label}`}
                 }]
             }
         }
