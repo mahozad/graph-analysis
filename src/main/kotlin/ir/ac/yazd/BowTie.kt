@@ -7,7 +7,7 @@ import java.util.*
 private val sourceFilePath = Path.of("src/main/resources/graph.txt")
 private lateinit var graph: Map<Int, List<Int>>
 
-// -Xmx8192m -Xss1024m
+// -Xmx4096m -Xss128m
 fun main() {
     determineIfGraphIsBowTie()
 }
@@ -57,7 +57,6 @@ fun canFirstNodeReachTheSecondNode(first: Int, second: Int): Boolean {
     val visited = mutableSetOf<Int>()
 
     fun run(first: Int, second: Int): Boolean {
-
         if (!graph.containsKey(first)) return false
         if (graph.neighborsOf(first).contains(second)) return true
 
