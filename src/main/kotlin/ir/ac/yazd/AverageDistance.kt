@@ -12,6 +12,7 @@ import kotlin.collections.ArrayList
 
 private const val NUMBER_OF_SAMPLE_PAIRS = 1000
 private val sourceFilePath = Path.of("src/main/resources/graph.txt")
+private val allDistancesFoundSoFar = Collections.synchronizedMap(mutableMapOf<Pair<Int, Int>, Int>())
 private val graph = Files.newBufferedReader(sourceFilePath)
     .lineSequence()
     .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
@@ -47,6 +48,7 @@ private class DistanceCalculator(private val node1: Int, private val node2: Int)
 private fun calculateShortestDistance(from: Int, to: Int): Int {
     if (from == to) return 0
     if (graph.getValue(from).contains(to)) return 1 // Shortcut
+    if (allDistancesFoundSoFar.containsKey(Pair(from, to))) return allDistancesFoundSoFar.getValue(Pair(from, to))
 
     val queue: Queue<Int> = LinkedList()
     queue.add(from)
@@ -65,7 +67,13 @@ private fun calculateShortestDistance(from: Int, to: Int): Int {
         visited.add(next) // NOTE: Should be after if
 
         if (!graph.keys.contains(next)) continue
-        if (graph.getValue(next).contains(to)) return depth
+        if (allDistancesFoundSoFar.containsKey(Pair(next, to))) {
+            return allDistancesFoundSoFar.getValue(Pair(next, to)) + depth - 1
+        }
+        if (graph.getValue(next).contains(to)) {
+            allDistancesFoundSoFar.put(Pair(from, to), depth)
+            return depth
+        }
 
         queue.addAll(graph.getValue(next))
         if (queue.element() == null) queue.add(null) // If all nodes of this level finished, add flag for next level
