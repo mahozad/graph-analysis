@@ -62,15 +62,13 @@ private fun calculateShortestDistance(from: Int, to: Int): Int {
         }
 
         if (visited.contains(next)) continue
-        if (!graph.keys.contains(next)) {
-            visited.add(next)
-            continue
-        }
+        visited.add(next) // NOTE: Should be after if
+
+        if (!graph.keys.contains(next)) continue
         if (graph.getValue(next).contains(to)) return depth
 
-        visited.add(next)
         queue.addAll(graph.getValue(next))
-        if (queue.element() == null) queue.add(null) // All nodes of this level finished so add flag for next level
+        if (queue.element() == null) queue.add(null) // If all nodes of this level finished, add flag for next level
     }
 
     return -1
