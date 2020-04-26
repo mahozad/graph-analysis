@@ -24,10 +24,10 @@ fun main() {
 
     val edgeCountList = generateListOfIngoingEdgeCount()
     val edgeCountFreq = groupEdgeCounts(edgeCountList)
-    val data = filterOnlyPowersOf10(edgeCountFreq)
     val (alpha, gamma) = calculateAlphaAndGamma(edgeCountFreq)
+    val graphData = filterOnlyPowersOf10(edgeCountFreq)
 
-    generateTheResultOutput(data, alpha, gamma, startTime)
+    generateTheResultOutput(graphData, alpha, gamma, startTime)
 }
 
 private fun generateListOfIngoingEdgeCount(): List<Int> {
