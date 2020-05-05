@@ -51,24 +51,23 @@ fun findNodesReachingTo(node: Int) = findNodeLineage(graphReverse, node)
 
 fun findNodesReachableFrom(node: Int) = findNodeLineage(graph, node)
 
-fun Map<Int, List<Int>>.neighborsOf(node: Int) = getValue(node)
+fun <T> Map<T, List<T>>.neighborsOf(node: T) = getOrDefault(node, emptyList())
 
 fun findNodeLineage(graph: Map<Int, List<Int>>, node: Int): Set<Int> {
     val result = mutableSetOf<Int>()
     val visited = mutableSetOf<Int>()
 
-    fun run(node: Int): Set<Int> {
-        if (!graph.containsKey(node)) return result
+    fun execute(node: Int) {
         visited.add(node)
         for (neighbor in graph.neighborsOf(node)) {
             if (visited.contains(neighbor)) continue
             result.add(neighbor)
-            run(neighbor)
+            execute(neighbor)
         }
-        return result
     }
 
-    return run(node)
+    execute(node)
+    return result
 }
 
 fun constructGraphs() {
