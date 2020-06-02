@@ -22,7 +22,7 @@ fun main() {
     println("Core size: ${coreNodes.size}")
     println("Out size: ${outNodes.size}")
     println("In size: ${inNodes.size}")
-    println("Other: ${(graph.size) - (coreNodes.size + outNodes.size + inNodes.size)}")
+    println("Others: ${(graph.size) - (coreNodes.size + outNodes.size + inNodes.size)}")
     println("Time: ${Duration.between(startTime, Instant.now()).toSeconds()}s")
 }
 
