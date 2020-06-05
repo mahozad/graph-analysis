@@ -6,10 +6,11 @@ import java.time.Duration
 import java.time.Instant
 
 private val sourceFilePath = Path.of("src/main/resources/graph.txt")
-private lateinit var graph: MutableMap<Int, List<Int>>
-private lateinit var graphReverse: MutableMap<Int, List<Int>>
+private var nodes = mutableSetOf<Int>()
+private var graph = mutableMapOf<Int, MutableList<Int>>()
+private var graphR = mutableMapOf<Int, MutableList<Int>>()
 
-// VM options: -Xmx4096m -Xss64m
+// VM options: -Xmx3072m -Xss64m
 fun main() {
     val startTime = Instant.now()
 
@@ -22,23 +23,23 @@ fun main() {
     println("Core size: ${coreNodes.size}")
     println("Out size: ${outNodes.size}")
     println("In size: ${inNodes.size}")
-    println("Others: ${(graph.size) - (coreNodes.size + outNodes.size + inNodes.size)}")
+    println("Others: ${(nodes.size) - (coreNodes.size + outNodes.size + inNodes.size)}")
     println("Time: ${Duration.between(startTime, Instant.now()).toSeconds()}s")
 }
 
 fun extractCore(): Set<Int> {
     val graphOrder = graph.size
     while (graph.isNotEmpty()) {
-        val node = graph.keys.random()
-        val nodeReaching = findNodesReachingTo(node) // Those that can reach this node
+        val node = nodes.random()
+        val nodeReaching = findNodesReachingTo(node) // Those that can reach to this node
         val nodeReachable = findNodesReachableFrom(node) // Those that can be reached from this node
 
-        val stronglyConnectedComponent = setOf(node) union (nodeReachable intersect nodeReaching)
-        graph.keys.removeAll(stronglyConnectedComponent)
-        graphReverse.keys.removeAll(stronglyConnectedComponent)
+        val scc = setOf(node) union (nodeReaching intersect nodeReachable)
+        graph.keys.removeAll(scc)
+        graphR.keys.removeAll(scc)
 
-        // If the component size is big enough, it is probably the core
-        if (stronglyConnectedComponent.size > 0.40 * graphOrder) return stronglyConnectedComponent
+        // If size of the strongly connected component is big enough, it is probably the core
+        if (scc.size > 0.40 * graphOrder) return scc
     }
     return emptySet()
 }
@@ -47,7 +48,7 @@ fun extractIn(core: Set<Int>) = findNodesReachingTo(core.random()) - core
 
 fun extractOut(core: Set<Int>) = findNodesReachableFrom(core.random()) - core
 
-fun findNodesReachingTo(node: Int) = findNodeLineage(graphReverse, node)
+fun findNodesReachingTo(node: Int) = findNodeLineage(graphR, node)
 
 fun findNodesReachableFrom(node: Int) = findNodeLineage(graph, node)
 
@@ -71,13 +72,17 @@ fun findNodeLineage(graph: Map<Int, List<Int>>, node: Int): Set<Int> {
 }
 
 fun constructGraphs() {
-    graph = Files.newBufferedReader(sourceFilePath)
-        .lineSequence()
-        .groupBy({ it.substringBefore(" ").toInt() }, { it.substringAfter(" ").toInt() })
-        .toMutableMap()
+    links()
+        .onEach { nodes.addAll(it.toList()) }
+        .groupByTo(graph, { it.first }, { it.second })
 
-    graphReverse = Files.newBufferedReader(sourceFilePath)
-        .lineSequence()
-        .groupBy({ it.substringAfter(" ").toInt() }, { it.substringBefore(" ").toInt() })
-        .toMutableMap()
+    links().groupByTo(graphR, { it.second }, { it.first })
+
+    for (node in nodes) {
+        graph.putIfAbsent(node, mutableListOf())
+        graphR.putIfAbsent(node, mutableListOf())
+    }
 }
+
+fun links() = Files.newBufferedReader(sourceFilePath).lineSequence()
+    .map { Pair(it.substringBefore(" ").toInt(), it.substringAfter(" ").toInt()) }
