@@ -38,7 +38,7 @@ fun extractCore(): Set<Int> {
         val nodeReaching = findNodesReachingTo(node) // Those that can reach to this node
         val nodeReachable = findNodesReachableFrom(node) // Those that can be reached from this node
 
-        val scc = setOf(node) union (nodeReaching intersect nodeReachable)
+        val scc = nodeReaching intersect nodeReachable
         graph.keys.removeAll(scc) // Very important
         graphR.keys.removeAll(scc)
 
@@ -59,8 +59,8 @@ fun findNodesReachableFrom(node: Int) = findNodeLineage(node, graph)
 fun <T> Map<T, List<T>>.neighborsOf(node: T) = getOrDefault(node, emptyList())
 
 fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
-    val result = mutableSetOf<Int>()
-    val visited = mutableSetOf<Int>()
+    val result = mutableSetOf(node)
+    val visited = mutableSetOf(node)
 
     fun execute(node: Int) {
         visited.add(node)
