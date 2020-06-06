@@ -35,7 +35,7 @@ fun extractCore(): Set<Int> {
         val nodeReachable = findNodesReachableFrom(node) // Those that can be reached from this node
 
         val scc = setOf(node) union (nodeReaching intersect nodeReachable)
-        graph.keys.removeAll(scc)
+        graph.keys.removeAll(scc) // Very important
         graphR.keys.removeAll(scc)
 
         // If size of the strongly connected component is big enough, it is probably the core
