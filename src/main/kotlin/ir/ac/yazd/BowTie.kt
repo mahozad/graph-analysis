@@ -1,3 +1,7 @@
+/**
+ * Author: Mahdi Hosseinzadeh
+ * Based on "Bow-tie decomposition in directed graphs" paper by Rong Yang
+ */
 package ir.ac.yazd
 
 import java.nio.file.Files
@@ -72,10 +76,7 @@ fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
 }
 
 fun constructGraphs() {
-    links()
-        .onEach { nodes.addAll(it.toList()) }
-        .groupByTo(graph, { it.first }, { it.second })
-
+    links().onEach { nodes.addAll(it.toList()) }.groupByTo(graph, { it.first }, { it.second })
     links().groupByTo(graphR, { it.second }, { it.first })
 
     for (node in nodes) {
