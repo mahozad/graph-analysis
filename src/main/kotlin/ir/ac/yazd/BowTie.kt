@@ -48,13 +48,13 @@ fun extractIn(core: Set<Int>) = findNodesReachingTo(core.random()) - core
 
 fun extractOut(core: Set<Int>) = findNodesReachableFrom(core.random()) - core
 
-fun findNodesReachingTo(node: Int) = findNodeLineage(graphR, node)
+fun findNodesReachingTo(node: Int) = findNodeLineage(node, graphR)
 
-fun findNodesReachableFrom(node: Int) = findNodeLineage(graph, node)
+fun findNodesReachableFrom(node: Int) = findNodeLineage(node, graph)
 
 fun <T> Map<T, List<T>>.neighborsOf(node: T) = getOrDefault(node, emptyList())
 
-fun findNodeLineage(graph: Map<Int, List<Int>>, node: Int): Set<Int> {
+fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
     val result = mutableSetOf<Int>()
     val visited = mutableSetOf<Int>()
 
