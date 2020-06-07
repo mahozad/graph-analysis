@@ -42,7 +42,7 @@ fun extractCore(): Set<Int> {
         graph.keys.removeAll(scc) // Very important
         graphR.keys.removeAll(scc)
 
-        // If size of the strongly connected component is big enough, it is probably the core
+        // If the strongly connected component is big enough, it is probably the core
         if (scc.size > 0.40 * graphOrder) return scc
     }
     return emptySet()
