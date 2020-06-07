@@ -76,8 +76,9 @@ fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
 }
 
 fun constructGraphs() {
-    links().onEach { nodes.addAll(it.toList()) }.groupByTo(graph, { it.first }, { it.second })
-    links().groupByTo(graphR, { it.second }, { it.first })
+    // TODO: Use onEach(nodes::addAll) in future versions of kotlin where it becomes smart enough
+    links().onEach { nodes.addAll(it) }.groupByTo(graph, { it.component1() }, { it.component2() })
+    links().groupByTo(graphR, { it.component2() }, { it.component1() })
 
     for (node in nodes) {
         graph.putIfAbsent(node, mutableListOf())
@@ -85,5 +86,6 @@ fun constructGraphs() {
     }
 }
 
-fun links() = Files.newBufferedReader(sourceFilePath).lineSequence()
-    .map { Pair(it.substringBefore(" ").toInt(), it.substringAfter(" ").toInt()) }
+fun links(): Sequence<List<Int>> =
+    Files.newBufferedReader(sourceFilePath).lineSequence()
+        .map { line -> line.split(" ").map { it.toInt() } }
