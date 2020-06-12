@@ -14,9 +14,9 @@ const val ANSI_CYAN = "\u001B[1;36m"
 const val ANSI_BLUE = "\u001B[1;34m"
 
 private val sourceFilePath = Path.of("src/main/resources/graph.txt")
-private var nodes = mutableSetOf<Int>()
-private var graph = mutableMapOf<Int, MutableList<Int>>()
-private var graphR = mutableMapOf<Int, MutableList<Int>>()
+private val nodes = mutableSetOf<Int>()
+private val graph = mutableMapOf<Int, MutableList<Int>>()
+private val graphR = mutableMapOf<Int, MutableList<Int>>()
 
 // VM options: -Xmx3072m -Xss64m
 fun main() {
