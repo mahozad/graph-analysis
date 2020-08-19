@@ -36,18 +36,17 @@ fun main() {
 }
 
 fun extractCore(): Set<Int> {
-    val graphOrder = graph.size
     while (graph.isNotEmpty()) {
         val node = nodes.random()
         val nodeReaching = findNodesReachingTo(node) // Those that can reach to this node
         val nodeReachable = findNodesReachableFrom(node) // Those that can be reached from this node
 
         val scc = nodeReaching intersect nodeReachable
-        graph.keys.removeAll(scc) // Very important
-        graphR.keys.removeAll(scc)
+        graph.keys.removeAll(scc)  // ⎛ Very important ⎞
+        graphR.keys.removeAll(scc) // ⎝ Very important ⎠
 
         // If the strongly connected component is big enough, it is probably the core
-        if (scc.size > 0.40 * graphOrder) return scc
+        if (scc.size > 0.40 * graph.size) return scc
     }
     return emptySet()
 }
@@ -80,8 +79,7 @@ fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
 }
 
 fun constructGraphs() {
-    // TODO: Use onEach(nodes::addAll) in future versions of kotlin where it becomes smart enough
-    links().onEach { nodes.addAll(it) }.groupByTo(graph, { it.component1() }, { it.component2() })
+    links().onEach(nodes::addAll).groupByTo(graph, { it.component1() }, { it.component2() })
     links().groupByTo(graphR, { it.component2() }, { it.component1() })
 
     for (node in nodes) {
