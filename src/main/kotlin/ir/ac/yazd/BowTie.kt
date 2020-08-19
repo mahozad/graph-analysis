@@ -1,6 +1,7 @@
 /**
- * Author: Mahdi Hosseinzadeh
- * Based on "Bow-tie decomposition in directed graphs" paper by Rong Yang
+ * Based on the paper "Bow-tie decomposition in directed graphs" by Rong Yang.
+ *
+ * @author Mahdi Hosseinzadeh
  */
 package ir.ac.yazd
 
