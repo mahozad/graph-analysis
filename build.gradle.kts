@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.4.0"
+    id("org.jetbrains.dokka") version "1.4.0-rc"
 }
 
 group = "ir.ac.yazd"
@@ -21,5 +22,8 @@ tasks {
     }
     compileTestKotlin {
         kotlinOptions.jvmTarget = "11"
+    }
+    dokkaHtml {
+        outputDirectory = "$buildDir/dokka"
     }
 }
