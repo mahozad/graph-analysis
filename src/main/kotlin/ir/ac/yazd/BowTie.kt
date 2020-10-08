@@ -15,7 +15,7 @@ private val nodes = mutableSetOf<Int>()
 private val graph = mutableMapOf<Int, MutableList<Int>>()
 private val graphR = mutableMapOf<Int, MutableList<Int>>()
 
-// VM options: -Xmx3072m -Xss64m
+// NOTE: Set VM options -Xmx3072m and -Xss16m for the program
 fun main() {
     val startTime = Instant.now()
 
