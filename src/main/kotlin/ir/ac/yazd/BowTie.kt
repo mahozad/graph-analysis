@@ -10,11 +10,7 @@ import java.nio.file.Path
 import java.time.Duration
 import java.time.Instant
 
-const val ANSI_RESET = "\u001B[0m"
-const val ANSI_CYAN = "\u001B[1;36m"
-const val ANSI_BLUE = "\u001B[1;34m"
-
-private val sourceFilePath = Path.of("src/main/resources/graph.txt")
+private val src = Path.of("src/main/resources/graph.txt")
 private val nodes = mutableSetOf<Int>()
 private val graph = mutableMapOf<Int, MutableList<Int>>()
 private val graphR = mutableMapOf<Int, MutableList<Int>>()
@@ -25,15 +21,15 @@ fun main() {
 
     constructGraphs()
     val coreNodes = extractCore()
-    /*re*/constructGraphs()
+    /*Re*/constructGraphs()
     val outNodes = extractOut(coreNodes)
     val inNodes = extractIn(coreNodes)
 
-    println("Core size: $ANSI_CYAN${coreNodes.size}$ANSI_RESET")
-    println("Out size: $ANSI_CYAN${outNodes.size}$ANSI_RESET")
-    println("In size: $ANSI_CYAN${inNodes.size}$ANSI_RESET")
-    println("Others: $ANSI_CYAN${(nodes.size) - (coreNodes.size + outNodes.size + inNodes.size)}$ANSI_RESET")
-    println("Time: $ANSI_BLUE${Duration.between(startTime, Instant.now()).toSeconds()}s$ANSI_RESET")
+    println("Core size: ${coreNodes.size}")
+    println("Out size: ${outNodes.size}")
+    println("In size: ${inNodes.size}")
+    println("Others: ${(nodes.size) - (coreNodes.size + outNodes.size + inNodes.size)}")
+    println("Time: ${Duration.between(startTime, Instant.now()).toSeconds()}s")
 }
 
 fun extractCore(): Set<Int> {
@@ -89,6 +85,6 @@ fun constructGraphs() {
     }
 }
 
-fun links(): Sequence<List<Int>> =
-    Files.newBufferedReader(sourceFilePath).lineSequence()
-        .map { line -> line.split(" ").map { it.toInt() } }
+fun links() = lines(src).map { line -> line.split(" ").map { it.toInt() } }
+
+fun lines(path: Path) = Files.newBufferedReader(path).lineSequence()
