@@ -75,6 +75,8 @@ fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
     return result
 }
 
+data class Link(val source: Int, val target: Int)
+
 fun constructGraphs() {
     links().onEach(nodes::addAll).groupByTo(graph, { it.component1() }, { it.component2() })
     links().groupByTo(graphR, { it.component2() }, { it.component1() })
