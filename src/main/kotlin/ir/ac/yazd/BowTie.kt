@@ -78,15 +78,16 @@ fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
 data class Link(val source: Int, val target: Int)
 
 fun constructGraphs() {
-    links().onEach(nodes::addAll).groupByTo(graph, { it.component1() }, { it.component2() })
-    links().groupByTo(graphR, { it.component2() }, { it.component1() })
-
-    for (node in nodes) {
-        graph.putIfAbsent(node, mutableListOf())
-        graphR.putIfAbsent(node, mutableListOf())
-    }
+    links().groupByTo(graph, Link::source, Link::target)
+    links().groupByTo(graphR, Link::target, Link::source)
+           .flatMapTo(nodes, { it.value + it.key })
+           .forEach {
+               graph.putIfAbsent(it, mutableListOf())
+               graphR.putIfAbsent(it, mutableListOf())
+           }
 }
 
-fun links() = lines(src).map { line -> line.split(" ").map { it.toInt() } }
+// fun links() = lines(src).map { line -> line.split(" ").map { it.toInt() } } // and then remove Link class and use List::first and list::last
+fun links() = lines().map { Link(it.substringBefore(' ').toInt(), it.substringAfter(' ').toInt()) }
 
-fun lines(path: Path) = Files.newBufferedReader(path).lineSequence()
+fun lines() = Files.newBufferedReader(src).lineSequence()
