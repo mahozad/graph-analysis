@@ -9,10 +9,10 @@ import java.nio.file.Path
 import java.time.Duration
 import java.time.Instant
 
-private val src = Path.of("src/main/resources/graph.txt")
-private val nodes = mutableSetOf<Int>()
-private val graph = mutableMapOf<Int, MutableList<Int>>()
-private val graphR = mutableMapOf<Int, MutableList<Int>>()
+val src = Path.of("src/main/resources/graph.txt")
+val nodes = mutableSetOf<Int>()
+val graph = mutableMapOf<Int, MutableList<Int>>()
+val graphR = mutableMapOf<Int, MutableList<Int>>()
 
 // NOTE: Set VM options -Xmx3072m and -Xss16m for the program
 fun main() {
