@@ -1,5 +1,3 @@
-package ir.ac.yazd
-
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
 import org.thymeleaf.templatemode.TemplateMode.HTML
