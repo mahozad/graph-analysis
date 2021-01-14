@@ -42,7 +42,7 @@ fun extractCore(): Set<Int> {
         graphR.keys.removeAll(scc) // ⎝ Very important ⎠
 
         // If the strongly connected component is big enough, it is probably the core
-        if (scc.size > 0.40 * graph.size) return scc
+        if (scc.size > 0.4 * graph.size) return scc
     }
     return emptySet()
 }
@@ -74,19 +74,16 @@ fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
     return result
 }
 
-data class Link(val source: Int, val target: Int)
-
 fun constructGraphs() {
-    links().groupByTo(graph, Link::source, Link::target)
-    links().groupByTo(graphR, Link::target, Link::source)
-           .flatMapTo(nodes, { it.value + it.key })
-           .forEach {
-               graph.putIfAbsent(it, mutableListOf())
-               graphR.putIfAbsent(it, mutableListOf())
-           }
+    links().onEach(nodes::addAll)
+           .groupByTo(graph, { it.first() }, { it.last() })
+    links().groupByTo(graphR, { it.last() }, { it.first() })
+    for (node in nodes) {
+        graph.putIfAbsent(node, mutableListOf())
+        graphR.putIfAbsent(node, mutableListOf())
+    }
 }
 
-// fun links() = lines(src).map { line -> line.split(" ").map { it.toInt() } } // and then remove Link class and use List::first and list::last
-fun links() = lines().map { Link(it.substringBefore(' ').toInt(), it.substringAfter(' ').toInt()) }
+fun links() = lines().map { it.split(" ").map(String::toInt) }
 
 fun lines() = Files.newBufferedReader(src).lineSequence()
