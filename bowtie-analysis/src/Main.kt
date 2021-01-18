@@ -81,9 +81,8 @@ fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
 fun constructGraphs() {
     links().groupByTo(graph, Link::source, Link::target)
     links().groupByTo(graphR, Link::target, Link::source)
-    graph.flatMapTo(nodes, { it.value + it.key })
-         .onEach { graph.putIfAbsent(it, mutableListOf()) }
-         .onEach { graphR.putIfAbsent(it, mutableListOf()) }
+    graph.flatMapTo(nodes) { it.value + it.key }
+    nodes.forEach { graph.putIfAbsent(it, mutableListOf()) }
 }
 
 fun links() = Files.newBufferedReader(src).lineSequence().map(String::toLink)
