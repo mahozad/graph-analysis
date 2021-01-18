@@ -64,7 +64,7 @@ fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
     fun execute(node: Int) {
         visited.add(node)
         for (neighbor in graph.neighborsOf(node)) {
-            if (visited.contains(neighbor)) continue
+            if (neighbor in visited) continue
             result.add(neighbor)
             execute(neighbor)
         }
