@@ -80,12 +80,10 @@ fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
 
 fun constructGraphs() {
     links().groupByTo(graph, Link::source, Link::target)
-           .flatMapTo(nodes, { it.value + it.key })
     links().groupByTo(graphR, Link::target, Link::source)
-    for (node in nodes) {
-        graph.putIfAbsent(node, mutableListOf())
-        graphR.putIfAbsent(node, mutableListOf())
-    }
+    graph.flatMapTo(nodes, { it.value + it.key })
+         .onEach { graph.putIfAbsent(it, mutableListOf()) }
+         .onEach { graphR.putIfAbsent(it, mutableListOf()) }
 }
 
 fun links() = Files.newBufferedReader(src).lineSequence().map(String::toLink)
