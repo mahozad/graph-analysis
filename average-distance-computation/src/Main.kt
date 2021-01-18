@@ -59,10 +59,10 @@ private class DistanceCalculator(private val node1: Int, private val node2: Int)
                 continue
             }
 
-            if (visited.contains(next)) continue
+            if (next in visited) continue
             visited.add(next) // NOTE: Should be after if
 
-            if (!graph.keys.contains(next)) continue
+            if (next !in graph.keys) continue
             if (graph.getValue(next).contains(to)) return depth
 
             queue.addAll(graph.getValue(next))
