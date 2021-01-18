@@ -9,6 +9,8 @@ import java.nio.file.Path
 import java.time.Duration
 import java.time.Instant
 
+data class Link(val source: Int, val target: Int)
+
 val src = Path.of("src/main/resources/graph.txt")
 val nodes = mutableSetOf<Int>()
 val graph = mutableMapOf<Int, MutableList<Int>>()
@@ -57,6 +59,8 @@ fun findNodesReachableFrom(node: Int) = findNodeLineage(node, graph)
 
 fun <T> Map<T, List<T>>.neighborsOf(node: T) = getOrDefault(node, emptyList())
 
+fun String.toLink() = Link(substringBefore(" ").toInt(), substringAfter(" ").toInt())
+
 fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
     val result = mutableSetOf(node)
     val visited = mutableSetOf(node)
@@ -75,15 +79,13 @@ fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
 }
 
 fun constructGraphs() {
-    links().onEach(nodes::addAll)
-           .groupByTo(graph, { it.first() }, { it.last() })
-    links().groupByTo(graphR, { it.last() }, { it.first() })
+    links().groupByTo(graph, Link::source, Link::target)
+           .flatMapTo(nodes, { it.value + it.key })
+    links().groupByTo(graphR, Link::target, Link::source)
     for (node in nodes) {
         graph.putIfAbsent(node, mutableListOf())
         graphR.putIfAbsent(node, mutableListOf())
     }
 }
 
-fun links() = lines().map { it.split(" ").map(String::toInt) }
-
-fun lines() = Files.newBufferedReader(src).lineSequence()
+fun links() = Files.newBufferedReader(src).lineSequence().map(String::toLink)
