@@ -7,7 +7,7 @@
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
-import java.time.Instant
+import java.time.Instant.now
 
 data class Link(val source: Int, val target: Int)
 
@@ -18,31 +18,29 @@ val graphR = mutableMapOf<Int, MutableList<Int>>()
 
 // NOTE: Set VM options -Xmx3072m and -Xss16m for the program
 fun main() {
-    val startTime = Instant.now()
+    val startTime = now()
 
     constructGraphs()
-    val coreNodes = extractCore()
+    val core = extractCore()
     /*Re*/constructGraphs()
-    val outNodes = extractOut(coreNodes)
-    val inNodes = extractIn(coreNodes)
+    val outs = extractOut(core)
+    val ins = extractIn(core)
 
-    println("Core size: ${coreNodes.size}")
-    println("Out size: ${outNodes.size}")
-    println("In size: ${inNodes.size}")
-    println("Others: ${(nodes.size) - (coreNodes.size + outNodes.size + inNodes.size)}")
-    println("Time: ${Duration.between(startTime, Instant.now()).toSeconds()}s")
+    println("Core size: ${core.size}")
+    println("Out size: ${outs.size}")
+    println("In size: ${ins.size}")
+    println("Others: ${(nodes - core - outs - ins).size}")
+    println("Time: ${Duration.between(startTime, now()).toSeconds()} s")
 }
 
 fun extractCore(): Set<Int> {
     while (graph.isNotEmpty()) {
         val node = nodes.random()
-        val nodeReaching = findNodesReachingTo(node) // Those that can reach to this node
-        val nodeReachable = findNodesReachableFrom(node) // Those that can be reached from this node
-
+        val nodeReaching = findNodesReachingTo(node)
+        val nodeReachable = findNodesReachableFrom(node)
         val scc = nodeReaching intersect nodeReachable
         graph.keys.removeAll(scc)  // ⎛ Very important ⎞
         graphR.keys.removeAll(scc) // ⎝ Very important ⎠
-
         // If the strongly connected component is big enough, it is probably the core
         if (scc.size > 0.4 * graph.size) return scc
     }
@@ -64,7 +62,6 @@ fun String.toLink() = Link(substringBefore(" ").toInt(), substringAfter(" ").toI
 fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
     val result = mutableSetOf(node)
     val visited = mutableSetOf(node)
-
     fun execute(node: Int) {
         visited.add(node)
         for (neighbor in graph.neighborsOf(node)) {
@@ -73,7 +70,6 @@ fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
             execute(neighbor)
         }
     }
-
     execute(node)
     return result
 }
