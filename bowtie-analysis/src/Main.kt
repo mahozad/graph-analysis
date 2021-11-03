@@ -4,14 +4,13 @@
  * @author Mahdi Hosseinzadeh
  */
 
-import java.nio.file.Files
-import java.nio.file.Path
+import java.io.File
 import java.time.Duration
 import java.time.Instant.now
 
 data class Link(val source: Int, val target: Int)
 
-val src = Path.of("src/main/resources/graph.txt")
+val src = File("src/main/resources/graph.txt")
 val nodes = mutableSetOf<Int>()
 val graph = mutableMapOf<Int, MutableList<Int>>()
 val graphR = mutableMapOf<Int, MutableList<Int>>()
@@ -81,4 +80,4 @@ fun constructGraphs() {
     nodes.forEach { graph.putIfAbsent(it, mutableListOf()) }
 }
 
-fun links() = Files.newBufferedReader(src).lineSequence().map(String::toLink)
+fun links() = src.bufferedReader().lineSequence().map(String::toLink)
