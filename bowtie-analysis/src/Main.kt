@@ -62,15 +62,15 @@ fun String.toLink() = Link(substringBefore(" ").toInt(), substringAfter(" ").toI
 fun findNodeLineage(node: Int, graph: Graph): Set<Int> {
     val result = mutableSetOf(node)
     val visited = mutableSetOf(node)
-    fun execute(node: Int) {
+    fun traverse(node: Int) {
         visited.add(node)
         for (neighbor in graph.neighborsOf(node)) {
             if (neighbor in visited) continue
             result.add(neighbor)
-            execute(neighbor)
+            traverse(neighbor)
         }
     }
-    execute(node)
+    traverse(node)
     return result
 }
 
