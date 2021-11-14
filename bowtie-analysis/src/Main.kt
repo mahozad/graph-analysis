@@ -63,7 +63,7 @@ fun findNodeLineage(node: Int, graph: Graph): Set<Int> {
     val result = mutableSetOf(node)
     val visited = mutableSetOf(node)
     fun traverse(node: Int) {
-        visited.add(node)
+        visited += node
         for (neighbor in graph.neighborsOf(node)) {
             if (neighbor in visited) continue
             result.add(neighbor)
