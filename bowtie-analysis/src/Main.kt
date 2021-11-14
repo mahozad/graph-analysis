@@ -7,14 +7,16 @@
 import java.io.File
 import java.time.Duration
 import java.time.Instant.now
-typealias Graph = Map<Int, List<Int>>
 
-data class Link(val source: Int, val target: Int)
+typealias Node = Int
+typealias Graph = Map<Node, List<Node>>
+
+data class Link(val source: Node, val target: Node)
 
 val src = File("src/main/resources/graph.txt")
-val nodes = mutableSetOf<Int>()
-val graph = mutableMapOf<Int, MutableList<Int>>()
-val graphR = mutableMapOf<Int, MutableList<Int>>()
+val nodes = mutableSetOf<Node>()
+val graph = mutableMapOf<Node, MutableList<Node>>()
+val graphR = mutableMapOf<Node, MutableList<Node>>()
 
 // NOTE: Set VM options -Xmx3072m and -Xss16m for the program
 fun main() {
@@ -33,7 +35,7 @@ fun main() {
     println("Time: ${Duration.between(startTime, now()).toSeconds()} s")
 }
 
-fun extractCore(): Set<Int> {
+fun extractCore(): Set<Node> {
     while (graph.isNotEmpty()) {
         val node = nodes.random()
         val nodeReaching = findNodesReachingTo(node)
@@ -47,22 +49,22 @@ fun extractCore(): Set<Int> {
     return emptySet()
 }
 
-fun extractIn(core: Set<Int>) = findNodesReachingTo(core.random()) - core
+fun extractIn(core: Set<Node>) = findNodesReachingTo(core.random()) - core
 
-fun extractOut(core: Set<Int>) = findNodesReachableFrom(core.random()) - core
+fun extractOut(core: Set<Node>) = findNodesReachableFrom(core.random()) - core
 
-fun Graph.neighborsOf(node: Int) = getOrDefault(node, emptyList())
+fun Graph.neighborsOf(node: Node) = getOrDefault(node, emptyList())
 
-fun findNodesReachingTo(node: Int) = findNodeLineage(node, graphR)
+fun findNodesReachingTo(node: Node) = findNodeLineage(node, graphR)
 
-fun findNodesReachableFrom(node: Int) = findNodeLineage(node, graph)
+fun findNodesReachableFrom(node: Node) = findNodeLineage(node, graph)
 
 fun String.toLink() = Link(substringBefore(" ").toInt(), substringAfter(" ").toInt())
 
-fun findNodeLineage(node: Int, graph: Graph): Set<Int> {
+fun findNodeLineage(node: Node, graph: Graph): Set<Node> {
     val result = mutableSetOf(node)
     val visited = mutableSetOf(node)
-    fun traverse(node: Int) {
+    fun traverse(node: Node) {
         visited += node
         for (neighbor in graph.neighborsOf(node)) {
             if (neighbor in visited) continue
