@@ -51,11 +51,11 @@ fun extractIn(core: Set<Int>) = findNodesReachingTo(core.random()) - core
 
 fun extractOut(core: Set<Int>) = findNodesReachableFrom(core.random()) - core
 
+fun Graph.neighborsOf(node: Int) = getOrDefault(node, emptyList())
+
 fun findNodesReachingTo(node: Int) = findNodeLineage(node, graphR)
 
 fun findNodesReachableFrom(node: Int) = findNodeLineage(node, graph)
-
-fun Graph.neighborsOf(node: Int) = getOrDefault(node, emptyList())
 
 fun String.toLink() = Link(substringBefore(" ").toInt(), substringAfter(" ").toInt())
 
