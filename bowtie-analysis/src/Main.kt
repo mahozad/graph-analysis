@@ -7,6 +7,7 @@
 import java.io.File
 import java.time.Duration
 import java.time.Instant.now
+typealias Graph = Map<Int, List<Int>>
 
 data class Link(val source: Int, val target: Int)
 
@@ -54,11 +55,11 @@ fun findNodesReachingTo(node: Int) = findNodeLineage(node, graphR)
 
 fun findNodesReachableFrom(node: Int) = findNodeLineage(node, graph)
 
-fun <T> Map<T, List<T>>.neighborsOf(node: T) = getOrDefault(node, emptyList())
+fun Graph.neighborsOf(node: Int) = getOrDefault(node, emptyList())
 
 fun String.toLink() = Link(substringBefore(" ").toInt(), substringAfter(" ").toInt())
 
-fun findNodeLineage(node: Int, graph: Map<Int, List<Int>>): Set<Int> {
+fun findNodeLineage(node: Int, graph: Graph): Set<Int> {
     val result = mutableSetOf(node)
     val visited = mutableSetOf(node)
     fun execute(node: Int) {
