@@ -1,5 +1,11 @@
 /**
- * Based on the paper "Bow-tie decomposition in directed graphs" by Rong Yang.
+ * Based on the algorithm from the paper "Bow-tie decomposition in directed graphs" by Rong Yang.
+ *
+ * Reads a directed, unweighted graph from an input file and detects its bowtie components.
+ *
+ * Every record (line) in the file should denote an edge
+ * from a start node id to an end node id (i.e. two numbers delimited by a space).
+ * For example, `31 7` denotes an edge from the vertex with id `31` to the vertex with id `7`.
  *
  * @author Mahdi Hosseinzadeh
  */
