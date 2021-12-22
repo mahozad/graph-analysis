@@ -67,6 +67,13 @@ fun findNodesReachableFrom(node: Node) = findNodeLineage(node, graph)
 
 fun String.toLink() = Link(substringBefore(" ").toInt(), substringAfter(" ").toInt())
 
+/**
+ * I wrote this function myself.
+ * Interesting enough, I saw a solution for this problem (DFS traverse)
+ * that used the approach just like me (inner function etc.).
+ * Cannot remember where I saw it. Maybe it was
+ * [here](https://programmer.group/kotlin-entry-6-function.html).
+ */
 fun findNodeLineage(node: Node, graph: Graph): Set<Node> {
     val result = mutableSetOf(node)
     val visited = mutableSetOf(node)
