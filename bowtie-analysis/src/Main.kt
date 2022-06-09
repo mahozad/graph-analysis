@@ -73,6 +73,10 @@ fun String.toLink() = Link(substringBefore(" ").toInt(), substringAfter(" ").toI
  * that used the approach just like me (inner function etc.).
  * Cannot remember where I saw it. Maybe it was
  * [here](https://programmer.group/kotlin-entry-6-function.html).
+ *
+ * If using recursion, we can use Kotlin 1.7 deep recursive functions
+ * to prevent stackoverflows.
+ * See https://youtu.be/54WEfLKtCGk?t=945
  */
 fun findNodeLineage(node: Node, graph: Graph): Set<Node> {
     val result = mutableSetOf(node)
